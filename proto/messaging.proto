@@ -1,0 +1,49 @@
+syntax = "proto3";
+
+package messaging;
+
+service MessagingService {
+  rpc EnviarMensaje (Mensaje) returns (Acuse);
+  rpc ReiniciarReloj (ControlRequest) returns (ControlResponse);
+  rpc ObtenerEventos (ControlRequest) returns (ListaEventos);
+}
+
+message Mensaje {
+  string sender = 1;
+  int64 timestamp = 2;
+  string message = 3;
+  string msg_id = 4;
+  bool record_event = 5;
+}
+
+message Acuse {
+  string status = 1;
+  string receiver = 2;
+  int64 timestamp = 3;
+  string msg_id = 4;
+}
+
+message ControlRequest {
+  string requester = 1;
+}
+
+message ControlResponse {
+  string status = 1;
+  string receiver = 2;
+  int64 timestamp = 3;
+}
+
+message EventoLamport {
+  string mechanism = 1;
+  string msg_id = 2;
+  string node = 3;
+  string peer = 4;
+  string event_type = 5;
+  int64 lamport_clock = 6;
+  string wall_time_iso = 7;
+}
+
+message ListaEventos {
+  string receiver = 1;
+  repeated EventoLamport events = 2;
+}
