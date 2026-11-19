@@ -1,0 +1,86 @@
+\documentclass[12pt,a4paper]{article}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[spanish,es-tabla]{babel}
+\usepackage[margin=2.5cm]{geometry}
+\usepackage{newtxtext,newtxmath}
+\usepackage{amsmath}
+\usepackage{booktabs}
+\usepackage{graphicx}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta,positioning,shapes.geometric,fit}
+\usepackage{csquotes}
+\usepackage[backend=biber,style=ieee,sorting=none]{biblatex}
+\usepackage[colorlinks=true,linkcolor=blue!60!black,citecolor=blue!60!black,urlcolor=blue!60!black]{hyperref}
+
+\addbibresource{referencias.bib}
+
+\lstset{
+  basicstyle=\ttfamily\footnotesize,
+  breaklines=true,
+  frame=single,
+  numbers=left,
+  numberstyle=\tiny\color{gray},
+  keywordstyle=\color{blue!70!black}\bfseries,
+  commentstyle=\color{green!45!black},
+  stringstyle=\color{red!60!black},
+  showstringspaces=false,
+  tabsize=4
+}
+
+\begin{document}
+
+\begin{titlepage}
+  \centering
+  \vspace*{0.8cm}
+  {\Large \textbf{UNIVERSIDAD TÉCNICA ESTATAL DE QUEVEDO}}\\[0.25cm]
+  {\large Facultad de Ciencias de la Computación y Diseño Digital}\\[0.15cm]
+  {\large Carrera de Ingeniería en Software (Rediseño)}\\[1.5cm]
+
+  {\large \textbf{PRÁCTICA EXPERIMENTAL — UNIDAD 1 (GA-SUM-02 / PE-U1)}}\\[0.5cm]
+  {\LARGE \textbf{Comunicación entre Procesos Distribuidos con Sockets TCP y gRPC: Evaluación Empírica y Ordenamiento con Relojes de Lamport}}\\[1.5cm]
+
+  \begin{flushleft}
+    \textbf{Asignatura:} Aplicaciones Distribuidas — 7mo Nivel, Paralelo ``A''\\[0.25cm]
+    \textbf{Docente:} Dr. Gleiston Cicerón Guerrero Ulloa\\[0.25cm]
+    \textbf{Equipo:} EJPZ\\[0.25cm]
+    \textbf{Integrantes:}
+    \begin{itemize}
+      \item Luis Jeremy Jaramillo Acosta (\texttt{@JeremyJaramillo72})
+      \item Kenny Isaías España Vera (\texttt{@KennyVera})
+      \item Heiner Ariel Zambrano Ronquillo (\texttt{@Heiner-ZZZ})
+      \item Luis Alberto Paca Pilataza (\texttt{@Luispaca2002})
+    \end{itemize}
+    \textbf{Fecha:} 22 de noviembre de 2026\\[0.25cm]
+    \textbf{Repositorio público:}\\
+    {\footnotesize \url{https://github.com/Heiner-ZZZ/GA-SUM-02-PE-U1-Comunicaci-n-entre-Procesos-Distribuidos-con-gRPC-y-Sockets-TCP}}
+  \end{flushleft}
+
+  \vfill
+  Quevedo — Los Ríos — Ecuador\\
+  Período Académico 2026--2027 SPA
+\end{titlepage}
+
+\tableofcontents
+\newpage
+
+\input{sections/01_resumen_objetivos}
+
+% Secciones modulares planificadas (se incorporan con \input conforme se completen):
+% \input{sections/02_fundamento_sd_ansa}
+% \input{sections/03_fundamento_comunicacion_fallos}
+% \input{sections/04_fundamento_lamport}
+% \input{sections/05_arquitectura_tcp}
+% \input{sections/06_implementacion_grpc}
+% \input{sections/07_protocolo_resultados_discusion}
+% \input{sections/08_lamport_conclusiones_ia}
+% \input{sections/09_conclusiones_individuales}
+% \input{sections/10_tabla_aportes}
+
+\newpage
+\printbibliography[title={Referencias}]
+
+\end{document}

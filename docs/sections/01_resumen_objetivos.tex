@@ -1,0 +1,30 @@
+\section*{Resumen}
+\addcontentsline{toc}{section}{Resumen}
+
+Esta práctica experimental evalúa de forma comparativa dos mecanismos de comunicación entre procesos en un sistema distribuido local compuesto por tres nodos (\texttt{nodo-A}, \texttt{nodo-B} y \texttt{nodo-C}) desplegados en los puertos 5000, 5001 y 5002. Por un lado se implementa mensajería directa mediante sockets TCP (\texttt{SOCK\_STREAM}) con entramado por prefijo de longitud y carga útil JSON; por otro, llamadas a procedimiento remoto sobre gRPC con serialización binaria en Protocol Buffers. Ambos mecanismos incorporan relojes lógicos escalares de Lamport para verificar el ordenamiento causal de 20 intercambios entre los tres nodos. El protocolo experimental descarta una corrida previa de calentamiento y ejecuta cinco repeticiones de 100 envíos con mensajes cortos (100 bytes) y largos (10 KB), además de una carga concurrente con los tres clientes transmitiendo de forma simultánea. A partir de los registros crudos protegidos con sumas SHA-256, un conjunto de scripts en Python calcula media, mediana, desviación estándar, percentil 95 y rendimiento en mensajes por segundo, genera tablas \texttt{booktabs} y gráficos a 300 DPI, y audita sobre datos reales tanto la invariante causal de Lamport como la existencia de eventos concurrentes con marcas lógicas idénticas.
+
+\section*{Abstract}
+\addcontentsline{toc}{section}{Abstract}
+
+This experimental study compares two inter-process communication mechanisms in a three-node local distributed system (\texttt{nodo-A}, \texttt{nodo-B}, and \texttt{nodo-C}) operating on ports 5000, 5001, and 5002. The first implementation relies on raw TCP sockets (\texttt{SOCK\_STREAM}) using length-prefixed framing and JSON payloads; the second uses gRPC over HTTP/2 with binary Protocol Buffers serialization. Both implementations integrate scalar Lamport logical clocks to validate causal ordering across 20 inter-node message exchanges. To ensure fair comparison, the experimental protocol discards an initial warm-up run and repeats 100-message latency measurements five times for short (100-byte) and large (10-KB) payloads, complemented by a concurrent workload in which all three clients transmit simultaneously. Python scripts process the unaltered CSV datasets verified with SHA-256 checksums to compute mean, median, standard deviation, 95th percentile latency, and throughput in messages per second, exporting \texttt{booktabs} tables and 300-DPI plots directly into this report. Finally, the verification pipeline checks the Lamport clock condition on real event traces and identifies concurrent events from distinct nodes sharing identical logical timestamps.
+
+\section{Objetivo e Hipótesis}
+
+\subsection{Objetivo General}
+Implementar, ejecutar y comparar empíricamente la comunicación entre procesos distribuidos mediante sockets TCP y gRPC en una arquitectura de tres nodos con sincronización lógica de Lamport, evaluando latencia, variabilidad, rendimiento, ordenamiento causal y aplicabilidad al proyecto de fin de curso del equipo.
+
+\subsection{Objetivos Específicos}
+\begin{enumerate}
+  \item Configurar tres procesos independientes (\texttt{nodo-A}, \texttt{nodo-B} y \texttt{nodo-C}) en \texttt{localhost} sobre los puertos 5000, 5001 y 5002 bajo un entorno Python 3.11+ reproducible.
+  \item Implementar la mensajería distribuida con relojes de Lamport tanto sobre sockets TCP con JSON como sobre gRPC con Protocol Buffers, aplicando un protocolo controlado con calentamiento, cinco repeticiones, tamaños de 100 B y 10 KB y carga concurrente.
+  \item Procesar los datos crudos con scripts reproducibles en Python para obtener métricas estadísticas, gráficos comparativos y verificación causal real de los relojes de Lamport~\cite{castello2024inductive}.
+  \item Documentar los fundamentos teóricos de la Unidad 1, la arquitectura, las decisiones técnicas y la discusión crítica respecto al sistema distribuido de Bolsa de Empleos UTEQ (PFC).
+\end{enumerate}
+
+\subsection{Hipótesis Previa a la Medición}
+Antes de ejecutar las corridas experimentales se formula la siguiente hipótesis diferenciada según el tamaño del mensaje y la concurrencia:
+\begin{itemize}
+  \item \textbf{Mensajes cortos (100 B, modo secuencial):} se espera que los \textbf{sockets TCP} alcancen una latencia media menor que gRPC. En cargas pequeñas sobre interfaz local (\texttt{loopback}), el costo de serializar un objeto JSON breve es bajo, mientras que gRPC introduce capas adicionales de entramado HTTP/2, gestión de canales y abstracción de \emph{stubs} que incrementan el tiempo fijo por invocación.
+  \item \textbf{Mensajes largos (10 KB) y escenario concurrente:} se espera que \textbf{gRPC} reduzca la diferencia de latencia o supere a sockets TCP en estabilidad del percentil 95 y en rendimiento bajo concurrencia, debido a la codificación binaria compacta de Protocol Buffers y a la multiplexación nativa de flujos sobre HTTP/2 sin necesidad de abrir múltiples conexiones TCP independientes.
+\end{itemize}
+Esta hipótesis se contrastará cuantitativamente en la Sección de Discusión a partir de las corridas reales almacenadas en \texttt{/data/}, mientras que la consistencia causal de los intercambios se verificará sobre los registros de relojes lógicos~\cite{castello2024inductive,mathur2022treeclock}.
