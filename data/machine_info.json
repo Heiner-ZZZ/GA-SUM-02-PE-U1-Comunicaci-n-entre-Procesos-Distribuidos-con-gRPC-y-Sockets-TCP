@@ -1,0 +1,24 @@
+{
+  "captured_at_utc": "2026-11-20T02:32:53.689769+00:00",
+  "captured_at_local": "2026-11-19T21:32:53.689769-05:00",
+  "hostname": "DESKTOP-OSLA9DF",
+  "os_system": "Windows",
+  "os_release": "11",
+  "os_version": "10.0.26200",
+  "architecture": "AMD64",
+  "processor": "AMD Ryzen 5 7535HS with Radeon Graphics",
+  "processor_raw": "AMD64 Family 25 Model 68 Stepping 1, AuthenticAMD",
+  "cpu_count_logical": 12,
+  "ram_total_gb": 15.32,
+  "python_version": "3.12.10",
+  "python_implementation": "CPython",
+  "execution_mode": "procesos locales en localhost",
+  "packages": {
+    "grpcio": "1.85.3",
+    "grpcio-tools": "1.85.3",
+    "protobuf": "7.36.2",
+    "pandas": "3.0.2",
+    "matplotlib": "3.11.2",
+    "numpy": "2.4.4"
+  }
+}

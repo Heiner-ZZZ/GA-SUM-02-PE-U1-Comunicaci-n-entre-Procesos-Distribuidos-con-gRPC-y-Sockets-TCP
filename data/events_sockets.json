@@ -1,0 +1,362 @@
+[
+  {
+    "mechanism": "sockets",
+    "msg_id": "ex-02",
+    "node": "nodo-B",
+    "peer": "nodo-C",
+    "event_type": "send",
+    "lamport_clock": 1,
+    "wall_time_iso": "2026-11-20T02:32:54.321902+00:00"
+  },
+  {
+    "mechanism": "sockets",
+    "msg_id": "ex-01",
+    "node": "nodo-A",
+    "peer": "nodo-C",
+    "event_type": "send",
+    "lamport_clock": 1,
+    "wall_time_iso": "2026-11-20T02:32:54.321902+00:00"
+  },
+  {
+    "mechanism": "sockets",
+    "msg_id": "ex-02",
+    "node": "nodo-C",
+    "peer": "nodo-B",
+    "event_type": "recv",
+    "lamport_clock": 2,
+    "wall_time_iso": "2026-11-20T02:32:54.321902+00:00"
+  },
+  {
+    "mechanism": "sockets",
+    "msg_id": "ex-01",
+    "node": "nodo-C",
+    "peer": "nodo-A",
+    "event_type": "recv",
+    "lamport_clock": 3,
+    "wall_time_iso": "2026-11-20T02:32:54.322478+00:00"
+  },
+  {
+    "mechanism": "sockets",
+    "msg_id": "ex-03",
+    "node": "nodo-C",
+    "peer": "nodo-A",
+    "event_type": "send",
+    "lamport_clock": 4,
+    "wall_time_iso": "2026-11-20T02:32:54.322478+00:00"
+  },
+  {
+    "mechanism": "sockets",
+    "msg_id": "ex-03",
+    "node": "nodo-A",
+    "peer": "nodo-C",
+    "event_type": "recv",
+    "lamport_clock": 5,
+    "wall_time_iso": "2026-11-20T02:32:54.322478+00:00"
+  },
+  {
+    "mechanism": "sockets",
+    "msg_id": "ex-04",
+    "node": "nodo-A",
+    "peer": "nodo-B",
+    "event_type": "send",
+    "lamport_clock": 6,
+    "wall_time_iso": "2026-11-20T02:32:54.337990+00:00"
+  },
+  {
+    "mechanism": "sockets",
+    "msg_id": "ex-04",
+    "node": "nodo-B",
+    "peer": "nodo-A",
+    "event_type": "recv",
+    "lamport_clock": 7,
+    "wall_time_iso": "2026-11-20T02:32:54.337990+00:00"
+  },
+  {
+    "mechanism": "sockets",
+    "msg_id": "ex-05",
+    "node": "nodo-B",
+    "peer": "nodo-C",
+    "event_type": "send",
+    "lamport_clock": 8,
+    "wall_time_iso": "2026-11-20T02:32:54.353889+00:00"
+  },
+  {
+    "mechanism": "sockets",
+    "msg_id": "ex-05",
+    "node": "nodo-C",
+    "peer": "nodo-B",
+    "event_type": "recv",
+    "lamport_clock": 9,
+    "wall_time_iso": "2026-11-20T02:32:54.353889+00:00"
+  },
+  {
+    "mechanism": "sockets",
+    "msg_id": "ex-06",
+    "node": "nodo-C",
+    "peer": "nodo-B",
+    "event_type": "send",
+    "lamport_clock": 10,
+    "wall_time_iso": "2026-11-20T02:32:54.369363+00:00"
+  },
+  {
+    "mechanism": "sockets",
+    "msg_id": "ex-06",
+    "node": "nodo-B",
+    "peer": "nodo-C",
+    "event_type": "recv",
+    "lamport_clock": 11,
+    "wall_time_iso": "2026-11-20T02:32:54.369363+00:00"
+  },
+  {
+    "mechanism": "sockets",
+    "msg_id": "ex-07",
+    "node": "nodo-B",
+    "peer": "nodo-A",
+    "event_type": "send",
+    "lamport_clock": 12,
+    "wall_time_iso": "2026-11-20T02:32:54.384857+00:00"
+  },
+  {
+    "mechanism": "sockets",
+    "msg_id": "ex-07",
+    "node": "nodo-A",
+    "peer": "nodo-B",
+    "event_type": "recv",
+    "lamport_clock": 13,
+    "wall_time_iso": "2026-11-20T02:32:54.384857+00:00"
+  },
+  {
+    "mechanism": "sockets",
+    "msg_id": "ex-08",
+    "node": "nodo-A",
+    "peer": "nodo-C",
+    "event_type": "send",
+    "lamport_clock": 14,
+    "wall_time_iso": "2026-11-20T02:32:54.400510+00:00"
+  },
+  {
+    "mechanism": "sockets",
+    "msg_id": "ex-08",
+    "node": "nodo-C",
+    "peer": "nodo-A",
+    "event_type": "recv",
+    "lamport_clock": 15,
+    "wall_time_iso": "2026-11-20T02:32:54.400510+00:00"
+  },
+  {
+    "mechanism": "sockets",
+    "msg_id": "ex-09",
+    "node": "nodo-A",
+    "peer": "nodo-B",
+    "event_type": "send",
+    "lamport_clock": 15,
+    "wall_time_iso": "2026-11-20T02:32:54.415989+00:00"
+  },
+  {
+    "mechanism": "sockets",
+    "msg_id": "ex-10",
+    "node": "nodo-C",
+    "peer": "nodo-B",
+    "event_type": "send",
+    "lamport_clock": 16,
+    "wall_time_iso": "2026-11-20T02:32:54.415989+00:00"
+  },
+  {
+    "mechanism": "sockets",
+    "msg_id": "ex-10",
+    "node": "nodo-B",
+    "peer": "nodo-C",
+    "event_type": "recv",
+    "lamport_clock": 17,
+    "wall_time_iso": "2026-11-20T02:32:54.415989+00:00"
+  },
+  {
+    "mechanism": "sockets",
+    "msg_id": "ex-09",
+    "node": "nodo-B",
+    "peer": "nodo-A",
+    "event_type": "recv",
+    "lamport_clock": 18,
+    "wall_time_iso": "2026-11-20T02:32:54.415989+00:00"
+  },
+  {
+    "mechanism": "sockets",
+    "msg_id": "ex-11",
+    "node": "nodo-B",
+    "peer": "nodo-A",
+    "event_type": "send",
+    "lamport_clock": 19,
+    "wall_time_iso": "2026-11-20T02:32:54.416993+00:00"
+  },
+  {
+    "mechanism": "sockets",
+    "msg_id": "ex-11",
+    "node": "nodo-A",
+    "peer": "nodo-B",
+    "event_type": "recv",
+    "lamport_clock": 20,
+    "wall_time_iso": "2026-11-20T02:32:54.416993+00:00"
+  },
+  {
+    "mechanism": "sockets",
+    "msg_id": "ex-12",
+    "node": "nodo-A",
+    "peer": "nodo-C",
+    "event_type": "send",
+    "lamport_clock": 21,
+    "wall_time_iso": "2026-11-20T02:32:54.431152+00:00"
+  },
+  {
+    "mechanism": "sockets",
+    "msg_id": "ex-12",
+    "node": "nodo-C",
+    "peer": "nodo-A",
+    "event_type": "recv",
+    "lamport_clock": 22,
+    "wall_time_iso": "2026-11-20T02:32:54.431152+00:00"
+  },
+  {
+    "mechanism": "sockets",
+    "msg_id": "ex-13",
+    "node": "nodo-C",
+    "peer": "nodo-B",
+    "event_type": "send",
+    "lamport_clock": 23,
+    "wall_time_iso": "2026-11-20T02:32:54.431152+00:00"
+  },
+  {
+    "mechanism": "sockets",
+    "msg_id": "ex-13",
+    "node": "nodo-B",
+    "peer": "nodo-C",
+    "event_type": "recv",
+    "lamport_clock": 24,
+    "wall_time_iso": "2026-11-20T02:32:54.432154+00:00"
+  },
+  {
+    "mechanism": "sockets",
+    "msg_id": "ex-14",
+    "node": "nodo-B",
+    "peer": "nodo-C",
+    "event_type": "send",
+    "lamport_clock": 25,
+    "wall_time_iso": "2026-11-20T02:32:54.447025+00:00"
+  },
+  {
+    "mechanism": "sockets",
+    "msg_id": "ex-14",
+    "node": "nodo-C",
+    "peer": "nodo-B",
+    "event_type": "recv",
+    "lamport_clock": 26,
+    "wall_time_iso": "2026-11-20T02:32:54.447025+00:00"
+  },
+  {
+    "mechanism": "sockets",
+    "msg_id": "ex-15",
+    "node": "nodo-C",
+    "peer": "nodo-A",
+    "event_type": "send",
+    "lamport_clock": 27,
+    "wall_time_iso": "2026-11-20T02:32:54.462659+00:00"
+  },
+  {
+    "mechanism": "sockets",
+    "msg_id": "ex-15",
+    "node": "nodo-A",
+    "peer": "nodo-C",
+    "event_type": "recv",
+    "lamport_clock": 28,
+    "wall_time_iso": "2026-11-20T02:32:54.462659+00:00"
+  },
+  {
+    "mechanism": "sockets",
+    "msg_id": "ex-16",
+    "node": "nodo-A",
+    "peer": "nodo-B",
+    "event_type": "send",
+    "lamport_clock": 29,
+    "wall_time_iso": "2026-11-20T02:32:54.477876+00:00"
+  },
+  {
+    "mechanism": "sockets",
+    "msg_id": "ex-16",
+    "node": "nodo-B",
+    "peer": "nodo-A",
+    "event_type": "recv",
+    "lamport_clock": 30,
+    "wall_time_iso": "2026-11-20T02:32:54.477876+00:00"
+  },
+  {
+    "mechanism": "sockets",
+    "msg_id": "ex-17",
+    "node": "nodo-B",
+    "peer": "nodo-A",
+    "event_type": "send",
+    "lamport_clock": 31,
+    "wall_time_iso": "2026-11-20T02:32:54.493141+00:00"
+  },
+  {
+    "mechanism": "sockets",
+    "msg_id": "ex-17",
+    "node": "nodo-A",
+    "peer": "nodo-B",
+    "event_type": "recv",
+    "lamport_clock": 32,
+    "wall_time_iso": "2026-11-20T02:32:54.493141+00:00"
+  },
+  {
+    "mechanism": "sockets",
+    "msg_id": "ex-18",
+    "node": "nodo-A",
+    "peer": "nodo-C",
+    "event_type": "send",
+    "lamport_clock": 33,
+    "wall_time_iso": "2026-11-20T02:32:54.493141+00:00"
+  },
+  {
+    "mechanism": "sockets",
+    "msg_id": "ex-18",
+    "node": "nodo-C",
+    "peer": "nodo-A",
+    "event_type": "recv",
+    "lamport_clock": 34,
+    "wall_time_iso": "2026-11-20T02:32:54.494650+00:00"
+  },
+  {
+    "mechanism": "sockets",
+    "msg_id": "ex-19",
+    "node": "nodo-C",
+    "peer": "nodo-B",
+    "event_type": "send",
+    "lamport_clock": 35,
+    "wall_time_iso": "2026-11-20T02:32:54.508805+00:00"
+  },
+  {
+    "mechanism": "sockets",
+    "msg_id": "ex-19",
+    "node": "nodo-B",
+    "peer": "nodo-C",
+    "event_type": "recv",
+    "lamport_clock": 36,
+    "wall_time_iso": "2026-11-20T02:32:54.508805+00:00"
+  },
+  {
+    "mechanism": "sockets",
+    "msg_id": "ex-20",
+    "node": "nodo-B",
+    "peer": "nodo-C",
+    "event_type": "send",
+    "lamport_clock": 37,
+    "wall_time_iso": "2026-11-20T02:32:54.523692+00:00"
+  },
+  {
+    "mechanism": "sockets",
+    "msg_id": "ex-20",
+    "node": "nodo-C",
+    "peer": "nodo-B",
+    "event_type": "recv",
+    "lamport_clock": 38,
+    "wall_time_iso": "2026-11-20T02:32:54.523692+00:00"
+  }
+]
