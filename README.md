@@ -8,9 +8,9 @@
 
 | Integrante | Usuario GitHub | Rol en la práctica |
 |---|---|---|
-| Heiner Ariel Zambrano Ronquillo | `@Heiner-ZZZ` | Núcleo Lamport/configuración, protocolo experimental, discusión PFC-CAP y compilación |
 | Luis Jeremy Jaramillo Acosta | `@JeremyJaramillo72` | Implementación Sockets TCP, arquitectura TikZ, fundamento SD/ANSA y documentación |
 | Kenny Isaías España Vera | `@Kespanav` | Contrato Protobuf, implementación gRPC, fundamento fallos/seguridad y QA reproducible |
+| Heiner Ariel Zambrano Ronquillo | `@Heiner-ZZZ` | Núcleo Lamport/configuración, protocolo experimental y discusión PFC-CAP |
 | Luis Alberto Paca Pilataza | `@Luispaca2002` | Motor estadístico, gráficos 300 DPI, verificación real de Lamport y conclusiones |
 
 ---
@@ -35,6 +35,7 @@ Ambos mecanismos implementan **relojes lógicos de Lamport**, ejecutan 20 interc
 ├── requirements.txt               # Dependencias exactas (Python 3.11+)
 ├── proto/                         # Contrato Protobuf (messaging.proto)
 ├── src/
+│   ├── run_experiments.py         # Orquestador experimental (TCP + gRPC en una sola máquina + SHA256SUMS)
 │   ├── common/
 │   │   ├── lamport.py             # Reloj lógico de Lamport thread-safe
 │   │   ├── config.py              # Definición de nodo-A/B/C, payloads (100 B, 10 KB) y esquemas CSV
@@ -50,8 +51,10 @@ Ambos mecanismos implementan **relojes lógicos de Lamport**, ejecutan 20 interc
 ├── data/                          # CSV crudos sin editar, machine_info.json y SHA256SUMS
 ├── analysis/
 │   ├── metrics.py                 # Estadísticas (media, mediana, desv., P95, IC 95 %, msg/s) y tablas booktabs
+│   ├── run_analysis.py            # Genera tablas booktabs y gráficos a 300 DPI desde data/latency_*.csv
+│   ├── verify_lamport.py          # Verifica L(recv) > L(send), monotonía por nodo y pares concurrentes
 │   └── generated/                 # Tablas LaTeX y resúmenes generados por script
-├── tests/                         # Pruebas unitarias y de integración (Lamport, TCP, gRPC, métricas)
+├── tests/                         # Pruebas unitarias y de integración (28 pruebas: Lamport, TCP, gRPC, análisis)
 └── docs/
     ├── guia1_practica.tex         # Archivo principal del informe
     ├── referencias.bib            # Bibliografía IEEE verificada con DOI (biblatex/biber)
@@ -60,18 +63,19 @@ Ambos mecanismos implementan **relojes lógicos de Lamport**, ejecutan 20 interc
         └── evidencias/            # Capturas de ejecución de los cuatro integrantes
 ```
 
-### Estado actual (19 de noviembre de 2026)
+### Estado actual (20 de noviembre de 2026)
 
 | Módulo | Estado |
 |---|---|
 | Núcleo común (`src/common/`): reloj de Lamport, configuración de nodos, registro de la máquina | Implementado y probado |
+| Orquestador experimental (`src/run_experiments.py`) | Implementado y ejecutado |
 | Sockets TCP (`src/sockets/`): framing, servidor y cliente | Implementado y probado |
 | gRPC (`proto/`, `src/grpc/`): contrato `.proto`, stubs, servidor y cliente | Implementado y probado |
 | Motor estadístico y tablas `booktabs` (`analysis/metrics.py`) | Implementado y probado |
-| Script de análisis con gráficos (`analysis/run_analysis.py`) | Implementado y probado |
-| Verificación de Lamport sobre los CSV reales | Pendiente |
+| Script de análisis con gráficos (`analysis/run_analysis.py`) | Implementado y probado (pendiente subir tablas/gráficos en `analysis/generated/` y `docs/figures/`) |
 | Corridas experimentales en `/data/` + `SHA256SUMS` | Completado (commit [`33b44da`](https://github.com/Heiner-ZZZ/GA-SUM-02-PE-U1-Comunicaci-n-entre-Procesos-Distribuidos-con-gRPC-y-Sockets-TCP/commit/33b44dacb02eebe1e3659a9c3ce2443be8ca5708)) |
-| Informe LaTeX (`docs/`) | En progreso (resumen, objetivos e hipótesis) |
+| Verificación de Lamport sobre los CSV reales (`analysis/verify_lamport.py`) | Completado (`20/20` en TCP y gRPC, commit [`2e59227`](https://github.com/Heiner-ZZZ/GA-SUM-02-PE-U1-Comunicaci-n-entre-Procesos-Distribuidos-con-gRPC-y-Sockets-TCP/commit/2e59227)) |
+| Informe LaTeX (`docs/`) | En progreso (`01_resumen_objetivos`, `07_protocolo_resultados_discusion`, `09_conclusion_zambrano`) |
 
 ---
 
@@ -191,6 +195,7 @@ python -m unittest discover -s tests -t . -v
 | `tests/test_grpc_integration.py` | 20 intercambios y benchmark gRPC sobre tres nodos |
 | `tests/test_metrics.py` | Motor estadístico, descarte de calentamiento y tablas `booktabs` |
 | `tests/test_analysis.py` | Script de análisis: tablas y gráficos a partir de CSV de prueba en una carpeta temporal |
+| `tests/test_verify_lamport.py` | Verificación causal `L(recv) > L(send)`, avance por nodo, pares concurrentes y tabla `booktabs` |
 
 ---
 
@@ -215,6 +220,16 @@ El script lee todos los `data/latency_*.csv`, descarta la corrida de calentamien
 | `docs/figures/barras_rendimiento.png` | Rendimiento en mensajes por segundo |
 
 Las tablas y gráficos del informe se incluyen desde estos archivos (`\input{...}` / `\includegraphics{...}`); no se escriben a mano. Opciones: `--data-dir`, `--out-dir` y `--fig-dir` para usar otras carpetas.
+
+### Verificación causal de relojes de Lamport
+
+Sobre `data/events_sockets.csv` y `data/events_grpc.csv`:
+
+```bat
+python -m analysis.verify_lamport
+```
+
+Comprueba `L(recv) > L(send)` en todos los mensajes, verifica que el reloj no se repita ni retroceda en ningún nodo, detecta pares reales de eventos concurrentes con el mismo valor de reloj en nodos distintos (`ex-01` y `ex-02` en `L = 1`, `ex-09` y `ex-08` en `L = 15`) y exporta `analysis/generated/tabla_lamport.tex` y `analysis/generated/verificacion_lamport.json` (con `--no-write` solo muestra el reporte en pantalla).
 
 ---
 
