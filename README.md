@@ -70,7 +70,7 @@ Ambos mecanismos implementan **relojes lógicos de Lamport**, ejecutan 20 interc
 | Motor estadístico y tablas `booktabs` (`analysis/metrics.py`) | Implementado y probado |
 | Script de análisis con gráficos (`analysis/run_analysis.py`) | Implementado y probado |
 | Verificación de Lamport sobre los CSV reales | Pendiente |
-| Corridas experimentales en `/data/` + `SHA256SUMS` | Pendiente |
+| Corridas experimentales en `/data/` + `SHA256SUMS` | Completado (commit [`33b44da`](https://github.com/Heiner-ZZZ/GA-SUM-02-PE-U1-Comunicaci-n-entre-Procesos-Distribuidos-con-gRPC-y-Sockets-TCP/commit/33b44dacb02eebe1e3659a9c3ce2443be8ca5708)) |
 | Informe LaTeX (`docs/`) | En progreso (resumen, objetivos e hipótesis) |
 
 ---
