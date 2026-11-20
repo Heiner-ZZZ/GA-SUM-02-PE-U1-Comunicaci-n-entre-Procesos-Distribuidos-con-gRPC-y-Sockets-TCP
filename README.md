@@ -68,7 +68,7 @@ Ambos mecanismos implementan **relojes lógicos de Lamport**, ejecutan 20 interc
 | Sockets TCP (`src/sockets/`): framing, servidor y cliente | Implementado y probado |
 | gRPC (`proto/`, `src/grpc/`): contrato `.proto`, stubs, servidor y cliente | Implementado y probado |
 | Motor estadístico y tablas `booktabs` (`analysis/metrics.py`) | Implementado y probado |
-| Script de análisis con gráficos (cajas y barras con intervalos) | Pendiente |
+| Script de análisis con gráficos (`analysis/run_analysis.py`) | Implementado y probado |
 | Verificación de Lamport sobre los CSV reales | Pendiente |
 | Corridas experimentales en `/data/` + `SHA256SUMS` | Pendiente |
 | Informe LaTeX (`docs/`) | En progreso (resumen, objetivos e hipótesis) |
@@ -190,12 +190,31 @@ python -m unittest discover -s tests -t . -v
 | `tests/test_grpc_server.py` | RPC de 100 B / 10 KB, eventos Lamport y llamadas concurrentes |
 | `tests/test_grpc_integration.py` | 20 intercambios y benchmark gRPC sobre tres nodos |
 | `tests/test_metrics.py` | Motor estadístico, descarte de calentamiento y tablas `booktabs` |
+| `tests/test_analysis.py` | Script de análisis: tablas y gráficos a partir de CSV de prueba en una carpeta temporal |
 
 ---
 
 ## Análisis de resultados
 
-*(Pendiente: el script que lee los CSV de `/data/`, calcula las métricas y genera los gráficos se documentará aquí cuando se integre.)*
+Después de ejecutar los clientes de sockets y gRPC (con `data/latency_sockets.csv` y `data/latency_grpc.csv` ya generados):
+
+```bat
+python -m analysis.run_analysis
+```
+
+El script lee todos los `data/latency_*.csv`, descarta la corrida de calentamiento y calcula, por mecanismo, modo y tamaño de mensaje: latencia media, mediana, desviación estándar, percentil 95, intervalo de confianza del 95 % y rendimiento (mensajes/s). Muestra el resumen en pantalla y genera:
+
+| Archivo | Contenido |
+|---|---|
+| `analysis/generated/resumen_latencias.csv` | Resumen completo de métricas |
+| `analysis/generated/tabla_latencias_sequential.tex` | Tabla `booktabs` del modo secuencial |
+| `analysis/generated/tabla_latencias_concurrent.tex` | Tabla `booktabs` del modo concurrente |
+| `analysis/generated/comparacion_relativa.csv` y `tabla_comparacion.tex` | Variación porcentual de gRPC respecto a Sockets TCP |
+| `docs/figures/boxplot_latencias.png` | Diagrama de cajas de las latencias (300 DPI) |
+| `docs/figures/barras_latencia_ic95.png` | Latencia media con intervalo de confianza del 95 % |
+| `docs/figures/barras_rendimiento.png` | Rendimiento en mensajes por segundo |
+
+Las tablas y gráficos del informe se incluyen desde estos archivos (`\input{...}` / `\includegraphics{...}`); no se escriben a mano. Opciones: `--data-dir`, `--out-dir` y `--fig-dir` para usar otras carpetas.
 
 ---
 
