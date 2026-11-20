@@ -10,7 +10,7 @@
 |---|---|---|
 | Heiner Ariel Zambrano Ronquillo | `@Heiner-ZZZ` | Núcleo Lamport/configuración, protocolo experimental, discusión PFC-CAP y compilación |
 | Luis Jeremy Jaramillo Acosta | `@JeremyJaramillo72` | Implementación Sockets TCP, arquitectura TikZ, fundamento SD/ANSA y documentación |
-| Kenny Isaías España Vera | `@KennyVera` | Contrato Protobuf, implementación gRPC, fundamento fallos/seguridad y QA reproducible |
+| Kenny Isaías España Vera | `@Kespanav` | Contrato Protobuf, implementación gRPC, fundamento fallos/seguridad y QA reproducible |
 | Luis Alberto Paca Pilataza | `@Luispaca2002` | Motor estadístico, gráficos 300 DPI, verificación real de Lamport y conclusiones |
 
 ---
@@ -39,24 +39,43 @@ Ambos mecanismos implementan **relojes lógicos de Lamport**, ejecutan 20 interc
 │   │   ├── lamport.py             # Reloj lógico de Lamport thread-safe
 │   │   ├── config.py              # Definición de nodo-A/B/C, payloads (100 B, 10 KB) y esquemas CSV
 │   │   └── machine_info.py        # Registro de SO, CPU, RAM y versión de Python
-│   ├── sockets/                   # Servidor, cliente y orquestador de Sockets TCP
-│   └── grpc/                      # Stubs generados, servidor, cliente y orquestador gRPC
+│   ├── sockets/
+│   │   ├── framing.py             # Entramado TCP: prefijo de longitud de 4 bytes + JSON
+│   │   ├── server.py              # Servidor TCP multihilo con reloj de Lamport
+│   │   └── client.py              # 20 intercambios Lamport + benchmark RTT (100 B / 10 KB, concurrencia)
+│   └── grpc/
+│       ├── messaging_pb2*.py      # Stubs generados con grpcio-tools desde proto/messaging.proto
+│       ├── server_grpc.py         # Servidor gRPC con reloj de Lamport
+│       └── client_grpc.py         # Mismo protocolo que el cliente TCP, sobre gRPC
 ├── data/                          # CSV crudos sin editar, machine_info.json y SHA256SUMS
 ├── analysis/
-│   └── generated/                 # Tablas LaTeX (booktabs) y resúmenes generados por script
-├── tests/                         # Pruebas unitarias y de integración
+│   ├── metrics.py                 # Estadísticas (media, mediana, desv., P95, IC 95 %, msg/s) y tablas booktabs
+│   └── generated/                 # Tablas LaTeX y resúmenes generados por script
+├── tests/                         # Pruebas unitarias y de integración (Lamport, TCP, gRPC, métricas)
 └── docs/
+    ├── guia1_practica.tex         # Archivo principal del informe
     ├── referencias.bib            # Bibliografía IEEE verificada con DOI (biblatex/biber)
     ├── sections/                  # Secciones modulares del informe LaTeX
     └── figures/
         └── evidencias/            # Capturas de ejecución de los cuatro integrantes
 ```
 
-> **Estado actual:** Estructura inicial y módulo común (`src/common/`) implementados y probados. Los módulos de `/proto/`, `/src/sockets/`, `/src/grpc/`, `/data/`, `/analysis/` y `/docs/` se integrarán progresivamente conforme al plan de commits del equipo (18 al 22 de noviembre de 2026).
+### Estado actual (19 de noviembre de 2026)
+
+| Módulo | Estado |
+|---|---|
+| Núcleo común (`src/common/`): reloj de Lamport, configuración de nodos, registro de la máquina | Implementado y probado |
+| Sockets TCP (`src/sockets/`): framing, servidor y cliente | Implementado y probado |
+| gRPC (`proto/`, `src/grpc/`): contrato `.proto`, stubs, servidor y cliente | Implementado y probado |
+| Motor estadístico y tablas `booktabs` (`analysis/metrics.py`) | Implementado y probado |
+| Script de análisis con gráficos (cajas y barras con intervalos) | Pendiente |
+| Verificación de Lamport sobre los CSV reales | Pendiente |
+| Corridas experimentales en `/data/` + `SHA256SUMS` | Pendiente |
+| Informe LaTeX (`docs/`) | En progreso (resumen, objetivos e hipótesis) |
 
 ---
 
-## Instalación y verificación inicial
+## Instalación
 
 Requisitos: **Python 3.11 o superior** (terminal recomendada en Windows: `cmd.exe`).
 
@@ -66,17 +85,117 @@ python -m venv .venv
 pip install -r requirements.txt
 ```
 
-Ejecutar pruebas unitarias del núcleo común:
+(Opcional) Regenerar los stubs gRPC a partir del contrato:
 
 ```bat
-python -m unittest discover -s tests -v
+proto\compile_proto.bat
 ```
 
-Inspeccionar condiciones de la máquina actual:
+---
+
+## Ejecución de los tres nodos
+
+Cada nodo es un proceso independiente en `localhost`: `nodo-A` → 5000, `nodo-B` → 5001, `nodo-C` → 5002. Abrir **tres terminales** (con el entorno `.venv` activado) en la raíz del repositorio.
+
+> Los servidores TCP y gRPC usan los mismos puertos: ejecutar **un mecanismo a la vez** y detener los nodos (`Ctrl+C`) antes de cambiar al otro.
+
+### Sockets TCP
+
+```bat
+python -m src.sockets.server --node nodo-A
+python -m src.sockets.server --node nodo-B
+python -m src.sockets.server --node nodo-C
+```
+
+En una cuarta terminal, ejecutar el cliente:
+
+```bat
+python -m src.sockets.client
+```
+
+Sin argumentos ejecuta los 20 intercambios Lamport y el benchmark completo, y genera:
+
+- `data/events_sockets.csv` y `data/events_sockets.json` (eventos: nodo, tipo, reloj y hora real)
+- `data/latency_sockets.csv` (latencias RTT)
+
+### gRPC
+
+```bat
+python -m src.grpc.server_grpc --node nodo-A
+python -m src.grpc.server_grpc --node nodo-B
+python -m src.grpc.server_grpc --node nodo-C
+```
+
+En una cuarta terminal:
+
+```bat
+python -m src.grpc.client_grpc
+```
+
+Genera `data/events_grpc.csv`, `data/events_grpc.json` y `data/latency_grpc.csv`, con el mismo esquema que los de sockets.
+
+### Opciones de los clientes (iguales en TCP y gRPC)
+
+| Opción | Descripción | Valor por defecto |
+|---|---|---|
+| `--exchanges` | Ejecuta solo los 20 intercambios Lamport | — |
+| `--benchmark` | Ejecuta solo las mediciones de latencia | — |
+| `--sizes 100B,10KB` | Tamaños de mensaje a medir | `100B,10KB` |
+| `--payload-bytes N` | Mide con un tamaño personalizado de `N` bytes | — |
+| `--runs N` | Repeticiones válidas | `5` |
+| `--messages N` | Envíos por repetición | `100` |
+| `--warmup N` | Envíos de la corrida de calentamiento (se descarta) | `100` |
+| `--no-concurrent` | Omite la prueba con los tres clientes a la vez | — |
+
+Ejemplo (cambiar el tamaño del mensaje y volver a medir):
+
+```bat
+python -m src.grpc.client_grpc --benchmark --payload-bytes 5000
+```
+
+### Protocolo experimental que ejecutan ambos clientes
+
+- **20 intercambios** entre los tres nodos con reloj de Lamport (tick antes de enviar; al recibir `max(local, recibido) + 1`), incluidos envíos simultáneos reales coordinados con `threading.Barrier`.
+- **Latencia RTT** medida con `time.perf_counter()`: 1 corrida de calentamiento de 100 envíos (descartada) + **5 repeticiones de 100 envíos**.
+- Dos tamaños de mensaje: **100 B** y **10 KB**.
+- Modo **secuencial** (nodo-A envía en round-robin) y modo **concurrente** (los tres clientes envían a la vez).
+
+---
+
+## Registro de las condiciones de la máquina
+
+```bat
+python -c "from src.common.machine_info import save_machine_info; print(save_machine_info())"
+```
+
+Guarda `data/machine_info.json` con sistema operativo, procesador, memoria, versión de Python, versiones de las librerías y modo de ejecución (procesos locales). Para solo verlo en pantalla:
 
 ```bat
 python -m src.common.machine_info
 ```
+
+---
+
+## Pruebas
+
+```bat
+python -m unittest discover -s tests -t . -v
+```
+
+| Archivo | Qué verifica |
+|---|---|
+| `tests/test_lamport.py` | Reglas del reloj de Lamport y configuración de nodos/payloads |
+| `tests/test_sockets_server.py` | Framing TCP, mensajes de 100 B / 10 KB y clientes concurrentes |
+| `tests/test_sockets_integration.py` | 20 intercambios y benchmark TCP sobre tres nodos |
+| `tests/test_grpc_server.py` | RPC de 100 B / 10 KB, eventos Lamport y llamadas concurrentes |
+| `tests/test_grpc_integration.py` | 20 intercambios y benchmark gRPC sobre tres nodos |
+| `tests/test_metrics.py` | Motor estadístico, descarte de calentamiento y tablas `booktabs` |
+
+---
+
+## Análisis de resultados
+
+*(Pendiente: el script que lee los CSV de `/data/`, calcula las métricas y genera los gráficos se documentará aquí cuando se integre.)*
 
 ---
 
