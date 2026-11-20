@@ -53,3 +53,17 @@
   - ~~Ejecutar la corrida experimental oficial en una sola máquina controlada (`python -m src.run_experiments`) para generar `/data/*` y `data/SHA256SUMS`.~~ *(Completado el 19/11/2026 por Luis Alberto Paca Pilataza en el commit [`33b44da`](https://github.com/Heiner-ZZZ/GA-SUM-02-PE-U1-Comunicaci-n-entre-Procesos-Distribuidos-con-gRPC-y-Sockets-TCP/commit/33b44dacb02eebe1e3659a9c3ce2443be8ca5708)).*
   - Ejecutar `python -m analysis.run_analysis` y `python -m analysis.verify_lamport` sobre los CSV reales para producir tablas `booktabs` y gráficos a 300 DPI.
   - Completar las secciones restantes del informe LaTeX, capturas de cada integrante en su equipo y video de respaldo.
+
+---
+
+## Sesión 3 — Viernes 20 de noviembre de 2026
+
+- **Asistentes:** Heiner Zambrano *(sesión en curso; los demás integrantes registrarán sus aportes del día al integrar sus módulos)*.
+- **Horario y horas trabajadas:**
+  - **Bloque mañana/mediodía (`10:30 – 13:10` | 2 h 40 min):** Zambrano sincronizó las corridas oficiales de `data/`, revisó los requisitos de evidencias y documentación LaTeX, ejecutó la verificación oficial de relojes lógicos de Lamport sobre los CSV publicados (`12:51`) y registró su captura de autoría en `cmd.exe`.
+  - **Total de la sesión (parcial):** 2 h 40 min (tiempo acumulado del proyecto: 18 h 20 min).
+- **Trabajo realizado:**
+  - **Zambrano — verificación oficial de Lamport y evidencia (`10:30 – 13:10`):** Ejecución real de `python -m analysis.verify_lamport` sobre `data/events_sockets.csv` y `data/events_grpc.csv` en Windows 11 (`HP`, usuario `hp\heiner`, `20/11/2026 12:51`). Se confirmó **20/20 (100,0 %)** cumplimiento de `L(recv) > L(send)` y monotonía local por nodo en ambos mecanismos (`L_max = 38`), así como dos pares reales de eventos concurrentes con igual valor de reloj en nodos distintos (`L = 1`: `ex-01` en `nodo-A` || `ex-02` en `nodo-B`; `L = 15`: `ex-09` en `nodo-A` || `ex-08` en `nodo-C`). Se generaron `analysis/generated/tabla_lamport.tex` y `analysis/generated/verificacion_lamport.json`, y se guardó la captura real en `docs/figures/evidencias/zambrano_verify_lamport_2026-11-20.jpg`.
+- **Problemas encontrados y solución:**
+  - *Hora del sistema en la captura de evidencia:* Una primera captura en `cmd.exe` mostraba usuario, equipo y fecha pero omitía la hora. Se repitió con `whoami & hostname & date /t & time /t` (`12:51`) para cumplir íntegramente los criterios de evidencia de autoría.
+  - *Protección de `data/SHA256SUMS` en capturas de nodos en vivo:* Se definió que cualquier ejecución demostrativa de los clientes TCP/gRPC para capturas redirija los CSV a `%TEMP%` (`--events-csv`) para no sobrescribir los datos crudos oficiales en `/data/`.

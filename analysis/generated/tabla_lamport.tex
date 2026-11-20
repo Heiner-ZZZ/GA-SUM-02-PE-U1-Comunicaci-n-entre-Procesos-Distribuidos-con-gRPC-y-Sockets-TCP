@@ -1,0 +1,14 @@
+\begin{table}[htbp]
+\centering
+\caption{Verificación causal de relojes lógicos de Lamport sobre los registros reales.}
+\label{tab:verificacion_lamport}
+\footnotesize
+\begin{tabular}{lrcrcl}
+\toprule
+Mecanismo & Mensajes & $L(\mathrm{recv}) > L(\mathrm{send})$ & $L_{\max}$ & Pares $L_a=L_b$ & Caso concurrente real \\
+\midrule
+Sockets TCP & 20 & 20/20 (100\,\%) & 38 & 2 & \texttt{ex-01} (nodo-A) $\parallel$ \texttt{ex-02} (nodo-B), $L=1$ \\
+gRPC & 20 & 20/20 (100\,\%) & 38 & 2 & \texttt{ex-01} (nodo-A) $\parallel$ \texttt{ex-02} (nodo-B), $L=1$ \\
+\bottomrule
+\end{tabular}
+\end{table}

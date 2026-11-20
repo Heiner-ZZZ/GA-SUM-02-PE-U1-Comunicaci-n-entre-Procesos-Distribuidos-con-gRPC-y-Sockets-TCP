@@ -1,0 +1,542 @@
+[
+  {
+    "mechanism": "sockets",
+    "total_events": 40,
+    "total_messages": 20,
+    "causal_ok_count": 20,
+    "causal_violations": [],
+    "pairing_errors": [],
+    "local_monotonic_ok": true,
+    "local_duplicates": [],
+    "max_clock": 38,
+    "per_node": {
+      "nodo-A": {
+        "events": 12,
+        "min_clock": 1,
+        "max_clock": 33
+      },
+      "nodo-B": {
+        "events": 14,
+        "min_clock": 1,
+        "max_clock": 37
+      },
+      "nodo-C": {
+        "events": 14,
+        "min_clock": 2,
+        "max_clock": 38
+      }
+    },
+    "concurrent_same_clock_pairs": [
+      {
+        "lamport_clock": 1,
+        "event_a": {
+          "msg_id": "ex-01",
+          "node": "nodo-A",
+          "peer": "nodo-C",
+          "event_type": "send",
+          "wall_time_iso": "2026-11-20T02:32:54.321902+00:00"
+        },
+        "event_b": {
+          "msg_id": "ex-02",
+          "node": "nodo-B",
+          "peer": "nodo-C",
+          "event_type": "send",
+          "wall_time_iso": "2026-11-20T02:32:54.321902+00:00"
+        },
+        "same_event_type": true
+      },
+      {
+        "lamport_clock": 15,
+        "event_a": {
+          "msg_id": "ex-09",
+          "node": "nodo-A",
+          "peer": "nodo-B",
+          "event_type": "send",
+          "wall_time_iso": "2026-11-20T02:32:54.415989+00:00"
+        },
+        "event_b": {
+          "msg_id": "ex-08",
+          "node": "nodo-C",
+          "peer": "nodo-A",
+          "event_type": "recv",
+          "wall_time_iso": "2026-11-20T02:32:54.400510+00:00"
+        },
+        "same_event_type": false
+      }
+    ],
+    "all_valid": true,
+    "message_checks": [
+      {
+        "msg_id": "ex-01",
+        "sender": "nodo-A",
+        "receiver": "nodo-C",
+        "send_clock": 1,
+        "recv_clock": 3,
+        "clock_delta": 2,
+        "nodes_match": true,
+        "causal_ok": true
+      },
+      {
+        "msg_id": "ex-02",
+        "sender": "nodo-B",
+        "receiver": "nodo-C",
+        "send_clock": 1,
+        "recv_clock": 2,
+        "clock_delta": 1,
+        "nodes_match": true,
+        "causal_ok": true
+      },
+      {
+        "msg_id": "ex-03",
+        "sender": "nodo-C",
+        "receiver": "nodo-A",
+        "send_clock": 4,
+        "recv_clock": 5,
+        "clock_delta": 1,
+        "nodes_match": true,
+        "causal_ok": true
+      },
+      {
+        "msg_id": "ex-04",
+        "sender": "nodo-A",
+        "receiver": "nodo-B",
+        "send_clock": 6,
+        "recv_clock": 7,
+        "clock_delta": 1,
+        "nodes_match": true,
+        "causal_ok": true
+      },
+      {
+        "msg_id": "ex-05",
+        "sender": "nodo-B",
+        "receiver": "nodo-C",
+        "send_clock": 8,
+        "recv_clock": 9,
+        "clock_delta": 1,
+        "nodes_match": true,
+        "causal_ok": true
+      },
+      {
+        "msg_id": "ex-06",
+        "sender": "nodo-C",
+        "receiver": "nodo-B",
+        "send_clock": 10,
+        "recv_clock": 11,
+        "clock_delta": 1,
+        "nodes_match": true,
+        "causal_ok": true
+      },
+      {
+        "msg_id": "ex-07",
+        "sender": "nodo-B",
+        "receiver": "nodo-A",
+        "send_clock": 12,
+        "recv_clock": 13,
+        "clock_delta": 1,
+        "nodes_match": true,
+        "causal_ok": true
+      },
+      {
+        "msg_id": "ex-08",
+        "sender": "nodo-A",
+        "receiver": "nodo-C",
+        "send_clock": 14,
+        "recv_clock": 15,
+        "clock_delta": 1,
+        "nodes_match": true,
+        "causal_ok": true
+      },
+      {
+        "msg_id": "ex-09",
+        "sender": "nodo-A",
+        "receiver": "nodo-B",
+        "send_clock": 15,
+        "recv_clock": 18,
+        "clock_delta": 3,
+        "nodes_match": true,
+        "causal_ok": true
+      },
+      {
+        "msg_id": "ex-10",
+        "sender": "nodo-C",
+        "receiver": "nodo-B",
+        "send_clock": 16,
+        "recv_clock": 17,
+        "clock_delta": 1,
+        "nodes_match": true,
+        "causal_ok": true
+      },
+      {
+        "msg_id": "ex-11",
+        "sender": "nodo-B",
+        "receiver": "nodo-A",
+        "send_clock": 19,
+        "recv_clock": 20,
+        "clock_delta": 1,
+        "nodes_match": true,
+        "causal_ok": true
+      },
+      {
+        "msg_id": "ex-12",
+        "sender": "nodo-A",
+        "receiver": "nodo-C",
+        "send_clock": 21,
+        "recv_clock": 22,
+        "clock_delta": 1,
+        "nodes_match": true,
+        "causal_ok": true
+      },
+      {
+        "msg_id": "ex-13",
+        "sender": "nodo-C",
+        "receiver": "nodo-B",
+        "send_clock": 23,
+        "recv_clock": 24,
+        "clock_delta": 1,
+        "nodes_match": true,
+        "causal_ok": true
+      },
+      {
+        "msg_id": "ex-14",
+        "sender": "nodo-B",
+        "receiver": "nodo-C",
+        "send_clock": 25,
+        "recv_clock": 26,
+        "clock_delta": 1,
+        "nodes_match": true,
+        "causal_ok": true
+      },
+      {
+        "msg_id": "ex-15",
+        "sender": "nodo-C",
+        "receiver": "nodo-A",
+        "send_clock": 27,
+        "recv_clock": 28,
+        "clock_delta": 1,
+        "nodes_match": true,
+        "causal_ok": true
+      },
+      {
+        "msg_id": "ex-16",
+        "sender": "nodo-A",
+        "receiver": "nodo-B",
+        "send_clock": 29,
+        "recv_clock": 30,
+        "clock_delta": 1,
+        "nodes_match": true,
+        "causal_ok": true
+      },
+      {
+        "msg_id": "ex-17",
+        "sender": "nodo-B",
+        "receiver": "nodo-A",
+        "send_clock": 31,
+        "recv_clock": 32,
+        "clock_delta": 1,
+        "nodes_match": true,
+        "causal_ok": true
+      },
+      {
+        "msg_id": "ex-18",
+        "sender": "nodo-A",
+        "receiver": "nodo-C",
+        "send_clock": 33,
+        "recv_clock": 34,
+        "clock_delta": 1,
+        "nodes_match": true,
+        "causal_ok": true
+      },
+      {
+        "msg_id": "ex-19",
+        "sender": "nodo-C",
+        "receiver": "nodo-B",
+        "send_clock": 35,
+        "recv_clock": 36,
+        "clock_delta": 1,
+        "nodes_match": true,
+        "causal_ok": true
+      },
+      {
+        "msg_id": "ex-20",
+        "sender": "nodo-B",
+        "receiver": "nodo-C",
+        "send_clock": 37,
+        "recv_clock": 38,
+        "clock_delta": 1,
+        "nodes_match": true,
+        "causal_ok": true
+      }
+    ],
+    "source_file": "events_sockets.csv"
+  },
+  {
+    "mechanism": "grpc",
+    "total_events": 40,
+    "total_messages": 20,
+    "causal_ok_count": 20,
+    "causal_violations": [],
+    "pairing_errors": [],
+    "local_monotonic_ok": true,
+    "local_duplicates": [],
+    "max_clock": 38,
+    "per_node": {
+      "nodo-A": {
+        "events": 12,
+        "min_clock": 1,
+        "max_clock": 33
+      },
+      "nodo-B": {
+        "events": 14,
+        "min_clock": 1,
+        "max_clock": 37
+      },
+      "nodo-C": {
+        "events": 14,
+        "min_clock": 2,
+        "max_clock": 38
+      }
+    },
+    "concurrent_same_clock_pairs": [
+      {
+        "lamport_clock": 1,
+        "event_a": {
+          "msg_id": "ex-01",
+          "node": "nodo-A",
+          "peer": "nodo-C",
+          "event_type": "send",
+          "wall_time_iso": "2026-11-20T02:32:56.884879+00:00"
+        },
+        "event_b": {
+          "msg_id": "ex-02",
+          "node": "nodo-B",
+          "peer": "nodo-C",
+          "event_type": "send",
+          "wall_time_iso": "2026-11-20T02:32:56.884879+00:00"
+        },
+        "same_event_type": true
+      },
+      {
+        "lamport_clock": 15,
+        "event_a": {
+          "msg_id": "ex-09",
+          "node": "nodo-A",
+          "peer": "nodo-B",
+          "event_type": "send",
+          "wall_time_iso": "2026-11-20T02:32:56.890925+00:00"
+        },
+        "event_b": {
+          "msg_id": "ex-08",
+          "node": "nodo-C",
+          "peer": "nodo-A",
+          "event_type": "recv",
+          "wall_time_iso": "2026-11-20T02:32:56.889921+00:00"
+        },
+        "same_event_type": false
+      }
+    ],
+    "all_valid": true,
+    "message_checks": [
+      {
+        "msg_id": "ex-01",
+        "sender": "nodo-A",
+        "receiver": "nodo-C",
+        "send_clock": 1,
+        "recv_clock": 3,
+        "clock_delta": 2,
+        "nodes_match": true,
+        "causal_ok": true
+      },
+      {
+        "msg_id": "ex-02",
+        "sender": "nodo-B",
+        "receiver": "nodo-C",
+        "send_clock": 1,
+        "recv_clock": 2,
+        "clock_delta": 1,
+        "nodes_match": true,
+        "causal_ok": true
+      },
+      {
+        "msg_id": "ex-03",
+        "sender": "nodo-C",
+        "receiver": "nodo-A",
+        "send_clock": 4,
+        "recv_clock": 5,
+        "clock_delta": 1,
+        "nodes_match": true,
+        "causal_ok": true
+      },
+      {
+        "msg_id": "ex-04",
+        "sender": "nodo-A",
+        "receiver": "nodo-B",
+        "send_clock": 6,
+        "recv_clock": 7,
+        "clock_delta": 1,
+        "nodes_match": true,
+        "causal_ok": true
+      },
+      {
+        "msg_id": "ex-05",
+        "sender": "nodo-B",
+        "receiver": "nodo-C",
+        "send_clock": 8,
+        "recv_clock": 9,
+        "clock_delta": 1,
+        "nodes_match": true,
+        "causal_ok": true
+      },
+      {
+        "msg_id": "ex-06",
+        "sender": "nodo-C",
+        "receiver": "nodo-B",
+        "send_clock": 10,
+        "recv_clock": 11,
+        "clock_delta": 1,
+        "nodes_match": true,
+        "causal_ok": true
+      },
+      {
+        "msg_id": "ex-07",
+        "sender": "nodo-B",
+        "receiver": "nodo-A",
+        "send_clock": 12,
+        "recv_clock": 13,
+        "clock_delta": 1,
+        "nodes_match": true,
+        "causal_ok": true
+      },
+      {
+        "msg_id": "ex-08",
+        "sender": "nodo-A",
+        "receiver": "nodo-C",
+        "send_clock": 14,
+        "recv_clock": 15,
+        "clock_delta": 1,
+        "nodes_match": true,
+        "causal_ok": true
+      },
+      {
+        "msg_id": "ex-09",
+        "sender": "nodo-A",
+        "receiver": "nodo-B",
+        "send_clock": 15,
+        "recv_clock": 18,
+        "clock_delta": 3,
+        "nodes_match": true,
+        "causal_ok": true
+      },
+      {
+        "msg_id": "ex-10",
+        "sender": "nodo-C",
+        "receiver": "nodo-B",
+        "send_clock": 16,
+        "recv_clock": 17,
+        "clock_delta": 1,
+        "nodes_match": true,
+        "causal_ok": true
+      },
+      {
+        "msg_id": "ex-11",
+        "sender": "nodo-B",
+        "receiver": "nodo-A",
+        "send_clock": 19,
+        "recv_clock": 20,
+        "clock_delta": 1,
+        "nodes_match": true,
+        "causal_ok": true
+      },
+      {
+        "msg_id": "ex-12",
+        "sender": "nodo-A",
+        "receiver": "nodo-C",
+        "send_clock": 21,
+        "recv_clock": 22,
+        "clock_delta": 1,
+        "nodes_match": true,
+        "causal_ok": true
+      },
+      {
+        "msg_id": "ex-13",
+        "sender": "nodo-C",
+        "receiver": "nodo-B",
+        "send_clock": 23,
+        "recv_clock": 24,
+        "clock_delta": 1,
+        "nodes_match": true,
+        "causal_ok": true
+      },
+      {
+        "msg_id": "ex-14",
+        "sender": "nodo-B",
+        "receiver": "nodo-C",
+        "send_clock": 25,
+        "recv_clock": 26,
+        "clock_delta": 1,
+        "nodes_match": true,
+        "causal_ok": true
+      },
+      {
+        "msg_id": "ex-15",
+        "sender": "nodo-C",
+        "receiver": "nodo-A",
+        "send_clock": 27,
+        "recv_clock": 28,
+        "clock_delta": 1,
+        "nodes_match": true,
+        "causal_ok": true
+      },
+      {
+        "msg_id": "ex-16",
+        "sender": "nodo-A",
+        "receiver": "nodo-B",
+        "send_clock": 29,
+        "recv_clock": 30,
+        "clock_delta": 1,
+        "nodes_match": true,
+        "causal_ok": true
+      },
+      {
+        "msg_id": "ex-17",
+        "sender": "nodo-B",
+        "receiver": "nodo-A",
+        "send_clock": 31,
+        "recv_clock": 32,
+        "clock_delta": 1,
+        "nodes_match": true,
+        "causal_ok": true
+      },
+      {
+        "msg_id": "ex-18",
+        "sender": "nodo-A",
+        "receiver": "nodo-C",
+        "send_clock": 33,
+        "recv_clock": 34,
+        "clock_delta": 1,
+        "nodes_match": true,
+        "causal_ok": true
+      },
+      {
+        "msg_id": "ex-19",
+        "sender": "nodo-C",
+        "receiver": "nodo-B",
+        "send_clock": 35,
+        "recv_clock": 36,
+        "clock_delta": 1,
+        "nodes_match": true,
+        "causal_ok": true
+      },
+      {
+        "msg_id": "ex-20",
+        "sender": "nodo-B",
+        "receiver": "nodo-C",
+        "send_clock": 37,
+        "recv_clock": 38,
+        "clock_delta": 1,
+        "nodes_match": true,
+        "causal_ok": true
+      }
+    ],
+    "source_file": "events_grpc.csv"
+  }
+]
