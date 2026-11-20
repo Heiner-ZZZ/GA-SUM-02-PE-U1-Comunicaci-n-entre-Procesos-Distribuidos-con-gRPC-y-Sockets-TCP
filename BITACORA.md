@@ -27,21 +27,27 @@
 
 ## Sesión 2 — Jueves 19 de noviembre de 2026
 
-- **Asistentes:** [COMPLETAR]
-- **Horario y horas trabajadas:** [COMPLETAR bloques y horas] (tiempo acumulado del proyecto: [COMPLETAR]).
+- **Asistentes:** Heiner Zambrano, Jeremy Jaramillo, Kenny España, Luis Paca.
+- **Horario y horas trabajadas:**
+  - **Bloque tarde (`16:00 – 19:10` | 3 h 10 min):** Implementación y pruebas de integración de los clientes TCP (`16:57`, Jaramillo) y gRPC (`18:38`, España), pruebas de integración TCP (`19:01`, Jaramillo) y actualización del `README.md`, bitácora y carátula (`19:07`, España).
+  - **Bloque noche — orquestador y metadatos (`19:10 – 19:37` | 27 min):** Zambrano implementó el orquestador experimental `src/run_experiments.py` y actualizó `src/common/machine_info.py` para capturar el modelo comercial del procesador de forma dinámica (`19:36`).
+  - **Bloque noche — análisis estadístico y verificador de Lamport (`19:37 – 20:30` | 53 min):** España integró `analysis/run_analysis.py` y `tests/test_analysis.py` (`19:51`). Sin solapar con su envío previo de las `19:36`, Zambrano dedicó el bloque `19:40 – 20:30` (50 min) a implementar y probar `analysis/verify_lamport.py` y `tests/test_verify_lamport.py`.
+  - **Total de la sesión:** 4 h 30 min (tiempo acumulado del proyecto: 13 h 40 min).
 - **Trabajo realizado:**
   - **Jaramillo — cliente TCP (`16:57`):** Implementación de `src/sockets/client.py` con los 20 intercambios entre los tres nodos con reloj de Lamport (incluidos envíos simultáneos reales coordinados con `threading.Barrier`) y el benchmark RTT con `time.perf_counter()`: calentamiento de 100 envíos descartado + 5 repeticiones de 100 envíos, mensajes de 100 B y 10 KB, en modo secuencial y con los tres clientes en concurrencia. Exporta `events_sockets.csv/.json` y `latency_sockets.csv`.
   - **España — cliente gRPC (`18:38`):** Implementación de `src/grpc/client_grpc.py`, que ejecuta exactamente el mismo protocolo que el cliente TCP (reutiliza la misma secuencia de intercambios y los mismos exportadores CSV/JSON) sobre los RPC `EnviarMensaje`, `ReiniciarReloj` y `ObtenerEventos`. Pruebas de integración en `tests/test_grpc_integration.py` levantando los tres nodos gRPC (3/3 aprobadas). Prueba manual con los tres servidores como procesos independientes en los puertos 5000–5002: 40 eventos y 4800 filas de latencia (4000 válidas).
   - **Jaramillo — pruebas de integración TCP (`19:01`):** `tests/test_sockets_integration.py` con tres servidores TCP locales: verificación de los 20 intercambios, de la relación `L(recv) > L(send)`, de eventos concurrentes con igual valor de reloj y del benchmark de 100 B / 10 KB (2/2 aprobadas).
-  - **Integración:** suite completa del repositorio con 20/20 pruebas aprobadas. Actualización del `README.md` con las instrucciones para ejecutar los nodos, los clientes, el registro de la máquina y las pruebas.
+  - **Zambrano — orquestador experimental y detección de CPU (`19:10 – 19:37`, commit `19:36`):** Incorporación de `src/run_experiments.py` para levantar los 3 procesos locales (`5000–5002`), correr el protocolo completo de TCP y gRPC secuencialmente en la misma máquina y generar `data/SHA256SUMS`; mejora en `src/common/machine_info.py` para leer dinámicamente el modelo legible del CPU en Windows (`winreg`) con respaldo multiplataforma.
+  - **Zambrano — verificador causal de Lamport (`19:40 – 20:30` | 50 min):** Implementación de `analysis/verify_lamport.py` y `tests/test_verify_lamport.py` (5/5 aprobadas) para validar los CSV reales (`events_sockets.csv` y `events_grpc.csv`), comprobar `L(recv) > L(send)` en el 100 % de los mensajes, verificar monotonía local por nodo, detectar pares concurrentes reales en nodos distintos con igual valor de reloj (como `ex-01` en `nodo-A` y `ex-02` en `nodo-B` con `L=1`, además de `L=15`) y exportar `analysis/generated/tabla_lamport.tex` y `verificacion_lamport.json`.
+  - **Integración:** suite completa del repositorio con 28/28 pruebas aprobadas.
 - **Problemas encontrados y solución:**
   - *Prueba intermitente en gRPC:* Una prueba que comparaba el valor máximo del reloj entre dos corridas fallaba de forma aleatoria. Causa: cuando `ex-09` y `ex-10` llegan a la vez a `nodo-B`, el valor final del reloj depende de cuál se procesa primero (comportamiento correcto de Lamport con eventos concurrentes). Solución: verificar el reinicio con un caso determinista (el primer paso siempre produce relojes 1 y 1 en el envío y 2 y 3 en la recepción).
   - *Lentitud al abrir canales gRPC en Windows:* Abrir un canal nuevo en cada intercambio hacía que los 20 intercambios tardaran ~5 s. Solución: un canal persistente por cada par emisor–receptor (los intercambios bajaron a ~1,5 s y la suite de 17 s a 6,5 s). No afecta a la latencia medida, porque el canal se abre y queda listo antes de empezar a medir.
   - *Conexiones compartidas entre clientes gRPC:* gRPC reutiliza por defecto la misma conexión entre canales del mismo proceso hacia un mismo destino, lo que no sería equivalente a TCP en la prueba concurrente. Solución: opción `grpc.use_local_subchannel_pool` para que cada cliente use su propia conexión.
   - *Resolución de la hora real en Windows:* `datetime.now()` tiene una resolución de ~1 ms, por lo que algunos eventos quedan con la misma hora. Solución: el orden se desempata con el valor del reloj de Lamport y la verificación empareja envío y recepción por `msg_id`; se documentará como amenaza a la validez.
+  - *Identificador críptico de CPU en Windows:* `platform.processor()` devolvía la cadena técnica de familia/modelo (`Intel64 Family 6...`). Solución: lectura dinámica de `ProcessorNameString` desde el registro de Windows en `src/common/machine_info.py` con respaldo a `platform.processor()` para otros sistemas operativos.
   - *Usuario de GitHub en los documentos:* El `README.md` y la carátula del informe indicaban un usuario distinto al que firma los commits de España. Se corrigió a `@Kespanav` para que la tabla de aportes enlace correctamente sus commits.
 - **Próximos pasos:**
-  - Script de análisis que lea los CSV de `/data/` y genere tablas, diagrama de cajas y gráfico de barras con intervalos.
-  - Script de verificación de Lamport sobre los CSV reales.
-  - Corridas experimentales completas de ambos mecanismos, `machine_info.json` y `SHA256SUMS`.
-  - Secciones restantes del informe LaTeX, capturas de cada integrante y video.
+  - Ejecutar la corrida experimental oficial en una sola máquina controlada (`python -m src.run_experiments`) para generar `/data/*` y `data/SHA256SUMS`.
+  - Ejecutar `python -m analysis.run_analysis` y `python -m analysis.verify_lamport` sobre los CSV reales para producir tablas `booktabs` y gráficos a 300 DPI.
+  - Completar las secciones restantes del informe LaTeX, capturas de cada integrante en su equipo y video de respaldo.
