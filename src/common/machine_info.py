@@ -52,6 +52,22 @@ def _get_total_ram_gb() -> Optional[float]:
         return None
 
 
+def _get_processor_name() -> str:
+    if sys.platform == "win32":
+        try:
+            import winreg
+
+            key_path = r"HARDWARE\DESCRIPTION\System\CentralProcessor\0"
+            with winreg.OpenKey(winreg.HKEY_LOCAL_MACHINE, key_path) as key:
+                value, _ = winreg.QueryValueEx(key, "ProcessorNameString")
+                cleaned = str(value).strip()
+                if cleaned:
+                    return cleaned
+        except OSError:
+            pass
+    return platform.processor() or platform.machine()
+
+
 def _get_package_versions() -> Dict[str, str]:
     versions: Dict[str, str] = {}
     for pkg in TRACKED_PACKAGES:
@@ -71,7 +87,8 @@ def collect_machine_info(execution_mode: str = "procesos locales en localhost") 
         "os_release": platform.release(),
         "os_version": platform.version(),
         "architecture": platform.machine(),
-        "processor": platform.processor(),
+        "processor": _get_processor_name(),
+        "processor_raw": platform.processor(),
         "cpu_count_logical": os.cpu_count(),
         "ram_total_gb": _get_total_ram_gb(),
         "python_version": platform.python_version(),
