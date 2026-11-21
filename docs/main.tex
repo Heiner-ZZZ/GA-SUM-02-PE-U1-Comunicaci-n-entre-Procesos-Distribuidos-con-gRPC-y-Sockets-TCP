@@ -194,3 +194,180 @@ En un sistema distribuido, un mensaje puede perderse, retrasarse o no tener resp
 Como los procesos no comparten un reloj físico perfectamente sincronizado, el orden de los eventos se define a partir de la causalidad. La relación ``sucedió antes'' ($\rightarrow$) se cumple cuando: (a) dos eventos ocurren en el mismo proceso y uno es anterior al otro; (b) un evento es el envío de un mensaje y el otro es su recepción; o (c) existe una cadena de eventos que conecta ambos por las reglas anteriores. Si ni $a \rightarrow b$ ni $b \rightarrow a$, los eventos son \emph{concurrentes} ($a \parallel b$): ninguno pudo influir en el otro~\cite{castello2024inductive}.
 
 \subsection{Reglas del reloj de Lamport}
+Cada proceso $P_i$ mantiene un contador entero $L_i$, inicialmente en cero, y aplica dos reglas:
+\begin{enumerate}
+  \item \textbf{Antes de cada evento local o envío:} $L_i \leftarrow L_i + 1$. El mensaje enviado lleva el valor $t = L_i$ como marca de tiempo.
+  \item \textbf{Al recibir un mensaje con marca $t$:} $L_i \leftarrow \max(L_i, t) + 1$.
+\end{enumerate}
+Con estas reglas se garantiza la \emph{condición de reloj}:
+\begin{equation}
+  a \rightarrow b \;\Rightarrow\; L(a) < L(b).
+  \label{eq:condicion_reloj}
+\end{equation}
+En particular, para todo mensaje, el valor del reloj al recibirlo es estrictamente mayor que el valor que tenía el emisor al enviarlo. Esta es la propiedad que se verifica sobre los datos reales en la sección de verificación del reloj de Lamport.
+
+\subsection{Limitación: el reloj no detecta la concurrencia}
+
+La implicación de la Ecuación~\eqref{eq:condicion_reloj} solo va en un sentido. Que $L(a) < L(b)$ no permite concluir que $a \rightarrow b$, porque los eventos podrían ser concurrentes. Además, dos eventos de procesos distintos pueden tener el mismo valor de reloj: si $L(a) = L(b)$, por la condición de reloj ninguno sucedió antes que el otro, así que son concurrentes, pero el valor por sí solo no basta para distinguir los casos en que los relojes son diferentes. Para detectar la concurrencia en general se necesitan relojes vectoriales o estructuras equivalentes, como los \emph{tree clocks}, que representan el conocimiento causal de cada proceso de forma más eficiente~\cite{mathur2022treeclock}. Por otra parte, el orden que impone Lamport es arbitrario entre eventos concurrentes, lo que ha motivado propuestas de ordenamiento que van más allá de los relojes lógicos escalares~\cite{haseeb2025beyond}.
+
+% ======================================================================
+% 05_arquitectura
+% ======================================================================
+\section{Arquitectura}
+\label{sec:arquitectura}
+
+\subsection{Topología de tres nodos}
+
+El sistema está formado por tres nodos que se ejecutan como procesos independientes en \texttt{localhost}: \texttt{nodo-A} en el puerto 5000, \texttt{nodo-B} en el 5001 y \texttt{nodo-C} en el 5002. Cada nodo levanta un servidor (TCP o gRPC, según el mecanismo que se mide) con su propio reloj de Lamport y su propio registro de recepciones, y escribe su nombre en cada línea de sus registros. Ambos mecanismos usan los mismos puertos, por lo que se ejecutan uno a la vez: el orquestador \texttt{src/run\_experiments.py} inicia los tres servidores de un mecanismo, espera a que los puertos acepten conexiones, ejecuta las pruebas, detiene los procesos y repite el ciclo con el otro mecanismo.
+
+Los clientes de cada nodo se ejecutan dentro del proceso del cliente (\texttt{client.py} o \texttt{client\_grpc.py}). Cada cliente lógico tiene su propio reloj de Lamport, abre sus propias conexiones hacia los demás nodos y, en las pruebas concurrentes, corre en su propio hilo. La Figura~\ref{fig:arquitectura} muestra la topología completa y el flujo de los datos hacia el análisis.
+
+% NOTA: comparar con el diagrama entregado en FORM-TL-01 y describir aquí los cambios respecto a esa versión.
+
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}[
+  node distance=1.1cm and 0.9cm,
+  servidor/.style={draw, rounded corners, fill=blue!8, align=center, minimum width=3.3cm, minimum height=1.5cm, font=\small},
+  cliente/.style={draw, rounded corners, fill=orange!12, align=center, minimum width=2.6cm, minimum height=1cm, font=\small},
+  datos/.style={draw, fill=gray!10, align=center, minimum width=3.6cm, minimum height=0.9cm, font=\small},
+  flecha/.style={-{Stealth[length=2.5mm]}, thick},
+  etiqueta/.style={font=\scriptsize, fill=white, inner sep=1pt}
+]
+  % Nodos servidores
+  \node[servidor] (A) {\textbf{nodo-A}\\ 127.0.0.1:5000\\ Servidor TCP | gRPC\\ \texttt{LamportClock}};
+  \node[servidor, right=of A] (B) {\textbf{nodo-B}\\ 127.0.0.1:5001\\ Servidor TCP | gRPC\\ \texttt{LamportClock}};
+  \node[servidor, right=of B] (C) {\textbf{nodo-C}\\ 127.0.0.1:5002\\ Servidor TCP | gRPC\\ \texttt{LamportClock}};
+
+  % Clientes logicos
+  \node[cliente, above=1.6cm of A] (cA) {Cliente A\\ \texttt{LamportClock}};
+  \node[cliente, above=1.6cm of B] (cB) {Cliente B\\ \texttt{LamportClock}};
+  \node[cliente, above=1.6cm of C] (cC) {Cliente C\\ \texttt{LamportClock}};
+  \node[draw, dashed, rounded corners, inner sep=6pt, fit=(cA)(cB)(cC),
+        label={[font=\small]above:Proceso cliente (\texttt{client.py} / \texttt{client\_grpc.py})}] (proc) {};
+
+  % Envios entre nodos (cada cliente envia a los otros dos nodos)
+  \draw[flecha] (cA.south) -- node[etiqueta, pos=0.45] {a B y C} (B.north west);
+  \draw[flecha] (cB.south) -- node[etiqueta, pos=0.35] {a A y C} (A.north east);
+  \draw[flecha] (cB.south) -- (C.north west);
+  \draw[flecha] (cC.south) -- node[etiqueta, pos=0.45] {a A y B} (B.north east);
+  \draw[flecha, dashed, gray] (B.south) to[bend left=12] node[etiqueta, below] {acuse con $L$ actualizado} (A.south);
+
+  % Datos y analisis
+  \node[datos, below=1.3cm of B] (data) {\texttt{/data/}: CSV de eventos y latencias,\\ \texttt{machine\_info.json}, \texttt{SHA256SUMS}};
+  \node[datos, below=0.8cm of data] (analisis) {\texttt{/analysis/}: \texttt{run\_analysis.py},\\ \texttt{verify\_lamport.py}};
+  \node[datos, below=0.8cm of analisis] (docs) {\texttt{/docs/}: tablas y gráficos del informe};
+  \draw[flecha] (data) -- (analisis);
+  \draw[flecha] (analisis) -- (docs);
+  \draw[flecha, gray] (C.south) |- (data.east);
+\end{tikzpicture}
+\caption{Arquitectura de tres nodos en \texttt{localhost}. Cada cliente lógico envía mensajes a los otros dos nodos con su marca de Lamport; el servidor responde con un acuse que contiene su reloj actualizado. Los registros se guardan en \texttt{/data/} y el análisis genera las tablas y gráficos del informe.}
+\label{fig:arquitectura}
+\end{figure}
+
+\subsection{Formato de los mensajes}
+
+En ambos mecanismos, un mensaje contiene los mismos campos lógicos. El enunciado exige \texttt{sender}, \texttt{timestamp} y \texttt{message}; el equipo añadió \texttt{msg\_id}, para emparejar cada envío con su recepción en la verificación de Lamport, y \texttt{record\_event}, para no registrar como eventos causales los miles de mensajes del benchmark de latencia (Tabla~\ref{tab:campos_mensaje}).
+
+\begin{table}[htbp]
+\centering
+\caption{Campos del mensaje en Sockets TCP (JSON) y en gRPC (Protocol Buffers).}
+\label{tab:campos_mensaje}
+\small
+\begin{tabular}{llll}
+\toprule
+Campo & JSON (TCP) & Protobuf (gRPC) & Significado \\
+\midrule
+\texttt{sender} & cadena & \texttt{string} (1) & Nodo emisor \\
+\texttt{timestamp} & entero & \texttt{int64} (2) & Reloj de Lamport del emisor al enviar \\
+\texttt{message} & cadena & \texttt{string} (3) & Contenido (100\,B o 10\,KB) \\
+\texttt{msg\_id} & cadena & \texttt{string} (4) & Identificador para emparejar envío y recepción \\
+\texttt{record\_event} & booleano & \texttt{bool} (5) & Si el servidor registra la recepción como evento \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+La respuesta del servidor (acuse) incluye \texttt{status}, \texttt{receiver}, el \texttt{timestamp} con el reloj del receptor ya actualizado y el \texttt{msg\_id} del mensaje confirmado.
+
+\subsection{Contrato del servicio gRPC}
+
+El Listado~\ref{lst:proto} muestra el archivo \texttt{proto/messaging.proto} completo, tal como se encuentra en el repositorio. El servicio \texttt{MessagingService} define tres llamadas: \texttt{EnviarMensaje}, que entrega un \texttt{Mensaje} y devuelve un \texttt{Acuse}; \texttt{ReiniciarReloj}, que deja el reloj y el registro del nodo en cero antes de cada corrida; y \texttt{ObtenerEventos}, que devuelve las recepciones registradas por el nodo para guardarlas en el CSV. Los \emph{stubs} \texttt{messaging\_pb2.py} y \texttt{messaging\_pb2\_grpc.py} se generan con \texttt{proto/compile\_proto.bat}, que ejecuta \texttt{grpc\_tools.protoc}.
+
+\begin{lstlisting}[language=Protobuf, caption={Contrato del servicio en \texttt{proto/messaging.proto}.}, label={lst:proto}]
+syntax = "proto3";
+
+package messaging;
+
+service MessagingService {
+  rpc EnviarMensaje (Mensaje) returns (Acuse);
+  rpc ReiniciarReloj (ControlRequest) returns (ControlResponse);
+  rpc ObtenerEventos (ControlRequest) returns (ListaEventos);
+}
+
+message Mensaje {
+  string sender = 1;
+  int64 timestamp = 2;
+  string message = 3;
+  string msg_id = 4;
+  bool record_event = 5;
+}
+
+message Acuse {
+  string status = 1;
+  string receiver = 2;
+  int64 timestamp = 3;
+  string msg_id = 4;
+}
+
+message ControlRequest {
+  string requester = 1;
+}
+
+message ControlResponse {
+  string status = 1;
+  string receiver = 2;
+  int64 timestamp = 3;
+}
+
+message EventoLamport {
+  string mechanism = 1;
+  string msg_id = 2;
+  string node = 3;
+  string peer = 4;
+  string event_type = 5;
+  int64 lamport_clock = 6;
+  string wall_time_iso = 7;
+}
+
+message ListaEventos {
+  string receiver = 1;
+  repeated EventoLamport events = 2;
+}
+\end{lstlisting}
+
+En Sockets TCP no existe un contrato equivalente: las operaciones de control (reiniciar el reloj y obtener los eventos) se envían como mensajes JSON con un campo \texttt{control}, y la validez de los campos solo se comprueba cuando el servidor los lee.
+
+% ======================================================================
+% 06_implementacion
+% ======================================================================
+\section{Implementación}
+\label{sec:implementacion}
+
+El código está en Python 3.11+ y se organiza en \texttt{src/common/} (reloj de Lamport, configuración de nodos y registro de la máquina), \texttt{src/sockets/}, \texttt{src/grpc/} y \texttt{proto/}. Las versiones exactas de las dependencias se fijan en \texttt{requirements.txt}. A continuación se describen las decisiones principales, con fragmentos breves del código del repositorio.
+
+\subsection{Reloj de Lamport seguro entre hilos}
+
+El reloj se implementó una sola vez en \texttt{src/common/lamport.py} y lo usan ambos mecanismos, lo que garantiza que las dos implementaciones apliquen exactamente las mismas reglas. Como los servidores atienden varios clientes a la vez, cada operación se protege con un \texttt{threading.Lock}; sin él, dos recepciones simultáneas podrían leer el mismo valor y producir marcas repetidas.
+
+\begin{lstlisting}[language=Python, caption={Reglas del reloj en \texttt{src/common/lamport.py}.}, label={lst:lamport}]
+def tick(self) -> int:
+    with self._lock:
+        self._value += 1
+        return self._value
+
+def update(self, received_timestamp: int) -> int:
+    with self._lock:
+        # Regla de Lamport al recibir: max(local, recibido) + 1
+        self._value = max(self._value, int(received_timestamp)) + 1
+        return self._value
+\end{lstlisting}
