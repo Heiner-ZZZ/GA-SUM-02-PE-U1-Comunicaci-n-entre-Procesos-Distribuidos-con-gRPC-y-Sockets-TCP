@@ -11,12 +11,19 @@
 \usepackage{listings}
 \usepackage{xcolor}
 \usepackage{tikz}
-\usetikzlibrary{arrows.meta,positioning,shapes.geometric,fit}
+\usetikzlibrary{arrows.meta,positioning,shapes.geometric,fit,babel}
 \usepackage{csquotes}
 \usepackage[backend=biber,style=ieee,sorting=none]{biblatex}
 \usepackage[colorlinks=true,linkcolor=blue!60!black,citecolor=blue!60!black,urlcolor=blue!60!black]{hyperref}
 
 \addbibresource{referencias.bib}
+
+\lstdefinelanguage{Protobuf}{
+  morekeywords={syntax,package,service,rpc,returns,message,repeated,string,int64,bool},
+  sensitive=true,
+  morecomment=[l]{//},
+  morestring=[b]"
+}
 
 \lstset{
   basicstyle=\ttfamily\footnotesize,
@@ -29,6 +36,31 @@
   stringstyle=\color{red!60!black},
   showstringspaces=false,
   tabsize=4
+}
+\renewcommand{\lstlistingname}{Listado}
+
+% ----------------------------------------------------------------------
+% Inclusion segura de tablas y figuras generadas por el analisis.
+% Busca primero en ../analysis/generated/ (repositorio local) y luego en
+% analysis/generated/ (dentro del proyecto de Overleaf). Si el archivo no
+% existe, inserta un recuadro en lugar de detener la compilacion.
+% ----------------------------------------------------------------------
+\newcommand{\incluirtabla}[3]{%
+  \IfFileExists{../analysis/generated/#1.tex}{\input{../analysis/generated/#1.tex}}{%
+    \IfFileExists{analysis/generated/#1.tex}{\input{analysis/generated/#1.tex}}{%
+      \begin{table}[htbp]
+        \centering
+        \caption{#3}
+        \label{#2}
+        \fbox{\parbox{0.9\textwidth}{\centering\small Tabla pendiente: subir \texttt{analysis/generated/\detokenize{#1}.tex} al proyecto.}}
+      \end{table}%
+    }%
+  }%
+}
+\newcommand{\incluirfigura}[2]{%
+  \IfFileExists{#2}{\includegraphics[width=#1]{#2}}{%
+    \fbox{\parbox[c][4cm][c]{0.9\textwidth}{\centering\small Figura pendiente: subir \texttt{\detokenize{#2}} al proyecto.}}%
+  }%
 }
 
 \begin{document}
@@ -67,20 +99,98 @@
 \tableofcontents
 \newpage
 
-\input{sections/01_resumen_objetivos}
+% ======================================================================
+% 01_resumen_objetivos
+% ======================================================================
+\section*{Resumen}
+\addcontentsline{toc}{section}{Resumen}
 
-% Secciones modulares planificadas (se incorporan con \input conforme se completen):
-% \input{sections/02_fundamento_sd_ansa}
-% \input{sections/03_fundamento_comunicacion_fallos}
-% \input{sections/04_fundamento_lamport}
-% \input{sections/05_arquitectura_tcp}
-% \input{sections/06_implementacion_grpc}
-% \input{sections/07_protocolo_resultados_discusion}
-% \input{sections/08_lamport_conclusiones_ia}
-% \input{sections/09_conclusiones_individuales}
-% \input{sections/10_tabla_aportes}
+Esta práctica experimental evalúa de forma comparativa dos mecanismos de comunicación entre procesos en un sistema distribuido local compuesto por tres nodos (\texttt{nodo-A}, \texttt{nodo-B} y \texttt{nodo-C}) desplegados en los puertos 5000, 5001 y 5002. Por un lado se implementa mensajería directa mediante sockets TCP (\texttt{SOCK\_STREAM}) con entramado por prefijo de longitud y carga útil JSON; por otro, llamadas a procedimiento remoto sobre gRPC con serialización binaria en Protocol Buffers. Ambos mecanismos incorporan relojes lógicos escalares de Lamport para verificar el ordenamiento causal de 20 intercambios entre los tres nodos. El protocolo experimental descarta una corrida previa de calentamiento y ejecuta cinco repeticiones de 100 envíos con mensajes cortos (100 bytes) y largos (10 KB), además de una carga concurrente con los tres clientes transmitiendo de forma simultánea. A partir de los registros crudos protegidos con sumas SHA-256, un conjunto de scripts en Python calcula media, mediana, desviación estándar, percentil 95 y rendimiento en mensajes por segundo, genera tablas \texttt{booktabs} y gráficos a 300 DPI, y audita sobre datos reales tanto la invariante causal de Lamport como la existencia de eventos concurrentes con marcas lógicas idénticas.
 
-\newpage
-\printbibliography[title={Referencias}]
+\section*{Abstract}
+\addcontentsline{toc}{section}{Abstract}
 
-\end{document}
+This experimental study compares two inter-process communication mechanisms in a three-node local distributed system (\texttt{nodo-A}, \texttt{nodo-B}, and \texttt{nodo-C}) operating on ports 5000, 5001, and 5002. The first implementation relies on raw TCP sockets (\texttt{SOCK\_STREAM}) using length-prefixed framing and JSON payloads; the second uses gRPC over HTTP/2 with binary Protocol Buffers serialization. Both implementations integrate scalar Lamport logical clocks to validate causal ordering across 20 inter-node message exchanges. To ensure fair comparison, the experimental protocol discards an initial warm-up run and repeats 100-message latency measurements five times for short (100-byte) and large (10-KB) payloads, complemented by a concurrent workload in which all three clients transmit simultaneously. Python scripts process the unaltered CSV datasets verified with SHA-256 checksums to compute mean, median, standard deviation, 95th percentile latency, and throughput in messages per second, exporting \texttt{booktabs} tables and 300-DPI plots directly into this report. Finally, the verification pipeline checks the Lamport clock condition on real event traces and identifies concurrent events from distinct nodes sharing identical logical timestamps.
+
+\section{Objetivo e Hipótesis}
+
+\subsection{Objetivo General}
+Implementar, ejecutar y comparar empíricamente la comunicación entre procesos distribuidos mediante sockets TCP y gRPC en una arquitectura de tres nodos con sincronización lógica de Lamport, evaluando latencia, variabilidad, rendimiento, ordenamiento causal y aplicabilidad al proyecto de fin de curso del equipo.
+
+\subsection{Objetivos Específicos}
+\begin{enumerate}
+  \item Configurar tres procesos independientes (\texttt{nodo-A}, \texttt{nodo-B} y \texttt{nodo-C}) en \texttt{localhost} sobre los puertos 5000, 5001 y 5002 bajo un entorno Python 3.11+ reproducible.
+  \item Implementar la mensajería distribuida con relojes de Lamport tanto sobre sockets TCP con JSON como sobre gRPC con Protocol Buffers, aplicando un protocolo controlado con calentamiento, cinco repeticiones, tamaños de 100 B y 10 KB y carga concurrente.
+  \item Procesar los datos crudos con scripts reproducibles en Python para obtener métricas estadísticas, gráficos comparativos y verificación causal real de los relojes de Lamport~\cite{castello2024inductive}.
+  \item Documentar los fundamentos teóricos de la Unidad 1, la arquitectura, las decisiones técnicas y la discusión crítica respecto al sistema distribuido de Bolsa de Empleos UTEQ (PFC).
+\end{enumerate}
+
+\subsection{Hipótesis Previa a la Medición}
+Antes de ejecutar las corridas experimentales se formula la siguiente hipótesis diferenciada según el tamaño del mensaje y la concurrencia:
+\begin{itemize}
+  \item \textbf{Mensajes cortos (100 B, modo secuencial):} se espera que los \textbf{sockets TCP} alcancen una latencia media menor que gRPC. En cargas pequeñas sobre interfaz local (\texttt{loopback}), el costo de serializar un objeto JSON breve es bajo, mientras que gRPC introduce capas adicionales de entramado HTTP/2, gestión de canales y abstracción de \emph{stubs} que incrementan el tiempo fijo por invocación.
+  \item \textbf{Mensajes largos (10 KB) y escenario concurrente:} se espera que \textbf{gRPC} reduzca la diferencia de latencia o supere a sockets TCP en estabilidad del percentil 95 y en rendimiento bajo concurrencia, debido a la codificación binaria compacta de Protocol Buffers y a la multiplexación nativa de flujos sobre HTTP/2 sin necesidad de abrir múltiples conexiones TCP independientes.
+\end{itemize}
+Esta hipótesis se contrastará cuantitativamente en la Sección de Discusión a partir de las corridas reales almacenadas en \texttt{/data/}, mientras que la consistencia causal de los intercambios se verificará sobre los registros de relojes lógicos~\cite{castello2024inductive,mathur2022treeclock}.
+
+% ======================================================================
+% 02_fundamento_sd_ansa
+% ======================================================================
+\section{Fundamentos de Sistemas Distribuidos}
+\label{sec:fundamento_sd}
+
+\subsection{Sistema distribuido y comunicación entre procesos}
+
+Un sistema distribuido está formado por procesos que se ejecutan en espacios de memoria separados y que solo pueden coordinarse intercambiando mensajes a través de una red. En esta práctica, los tres procesos (\texttt{nodo-A}, \texttt{nodo-B} y \texttt{nodo-C}) se ejecutan en la misma máquina, pero no comparten memoria: cada uno mantiene su propio reloj lógico y su propio registro de eventos, y toda la información que necesita de los demás le llega por un socket. Esta separación es la que obliga a definir un protocolo de comunicación explícito y un criterio para ordenar los eventos sin un reloj global.
+
+En arquitecturas de microservicios, como la del proyecto de fin de curso del equipo, esta comunicación entre procesos es el punto donde se concentran tanto los costos de rendimiento como los riesgos de seguridad y de fallo~\cite{zhu2025rethinking,haindl2024security}. Por eso, elegir el mecanismo de comunicación (un protocolo propio sobre TCP o un \emph{framework} de RPC como gRPC) es una decisión de diseño que afecta a la latencia, a la facilidad de desarrollo y a la robustez del sistema.
+
+\subsection{Transparencias ANSA}
+
+El modelo de referencia ANSA describe las \emph{transparencias} que un sistema distribuido debería ofrecer para que el usuario o el programador lo perciba como un único sistema. Las más relevantes para esta práctica son:
+\begin{itemize}
+  \item \textbf{Acceso:} los recursos locales y remotos se usan con las mismas operaciones. gRPC la ofrece al permitir invocar \texttt{EnviarMensaje} como si fuera un método local; los sockets TCP no, porque el programador construye y lee cada mensaje.
+  \item \textbf{Ubicación:} se accede a un recurso sin conocer su dirección física. En el prototipo, las direcciones \texttt{127.0.0.1:5000--5002} están fijas en \texttt{src/common/config.py}.
+  \item \textbf{Concurrencia:} varios procesos usan un recurso compartido sin interferir entre sí. Los servidores atienden clientes simultáneos y protegen su reloj con un \emph{lock}.
+  \item \textbf{Fallos:} el sistema oculta o tolera la caída de alguno de sus componentes.
+  \item \textbf{Replicación, migración y persistencia:} el usuario no percibe que un recurso esté replicado, se haya movido o se guarde en almacenamiento persistente.
+\end{itemize}
+La discusión (Sección~\ref{sec:discusion}) analiza cuáles de estas transparencias se lograron en el prototipo y cómo se implementarían las faltantes.
+
+\subsection{Consistencia, disponibilidad y particiones}
+
+El teorema CAP establece que, cuando ocurre una partición de red, un sistema distribuido debe sacrificar la consistencia o la disponibilidad~\cite{khoshaba2023cap}. Este criterio orienta la elección del mecanismo de comunicación en el proyecto del equipo: las operaciones que deben ser consistentes requieren llamadas síncronas con contratos estrictos y manejo explícito de errores, mientras que las que priorizan la disponibilidad pueden apoyarse en comunicación asíncrona y patrones de recuperación~\cite{mohammad2025resilient}.
+
+% ======================================================================
+% 03_fundamento_comunicacion_fallos
+% ======================================================================
+\section{Mecanismos de Comunicación entre Procesos}
+\label{sec:fundamento_comunicacion}
+
+\subsection{Sockets TCP}
+
+Un socket TCP (\texttt{SOCK\_STREAM}) ofrece un canal confiable y ordenado de bytes entre dos procesos, pero no conserva los límites de los mensajes: una escritura de 10\,KB puede llegar al receptor partida en varios fragmentos, y dos escrituras seguidas pueden llegar juntas. Por eso, quien programa con sockets debe definir su propio protocolo de aplicación, es decir, cómo se delimita cada mensaje (entramado o \emph{framing}), cómo se codifica su contenido y cómo se responden los errores~\cite{liu2022session}. A cambio de ese trabajo adicional, el programador controla cada byte que viaja por la red y evita capas intermedias.
+
+\subsection{gRPC y Protocol Buffers}
+
+gRPC es un \emph{framework} de llamada a procedimiento remoto (RPC): el programador describe el servicio y sus mensajes en un archivo \texttt{.proto}, y la herramienta \texttt{grpcio-tools} genera el código del cliente (\emph{stub}) y del servidor. Las llamadas viajan sobre HTTP/2 y los mensajes se codifican en binario con Protocol Buffers. Esto aporta un contrato tipado compartido por cliente y servidor, generación automática de código, plazos (\emph{deadlines}) por llamada y códigos de estado estandarizados~\cite{zhu2025rethinking}.
+
+\subsection{Evidencia previa sobre su rendimiento}
+
+Los estudios comparativos sobre comunicación entre microservicios muestran que no existe un mecanismo superior en todos los escenarios: el resultado depende del tamaño y la estructura de los mensajes, de la concurrencia y del entorno de despliegue~\cite{ciftci2025review}. En evaluaciones de REST, GraphQL y gRPC, el rendimiento relativo varía según la carga y el tipo de operación~\cite{niswar2024performance}. En cuanto a la serialización, los formatos binarios como Protocol Buffers suelen producir mensajes más compactos que los formatos de texto como JSON, aunque el costo real de codificar y decodificar depende del lenguaje y de la biblioteca utilizada~\cite{jackson2024streaming,mehdi2026crosslanguage}. Esta variabilidad justifica medir ambos mecanismos en el entorno propio del equipo, en lugar de asumir el resultado a partir de la literatura.
+
+\subsection{Fallos en la comunicación}
+
+En un sistema distribuido, un mensaje puede perderse, retrasarse o no tener respuesta porque el proceso remoto falló o quedó aislado por una partición. Con sockets TCP, estos casos aparecen como excepciones de bajo nivel (\texttt{ConnectionRefusedError}, \texttt{TimeoutError} o una conexión cerrada a mitad de un mensaje) que el programador debe detectar y tratar. En gRPC, los mismos problemas se traducen en códigos de estado como \texttt{UNAVAILABLE} o \texttt{DEADLINE\_EXCEEDED}. En ambos casos, la recuperación (reintentos, plazos y disyuntores) es responsabilidad de la aplicación~\cite{mohammad2025resilient}, y la superficie de comunicación entre servicios debe protegerse frente a amenazas de seguridad~\cite{haindl2024security}.
+
+% ======================================================================
+% 04_fundamento_lamport
+% ======================================================================
+\section{Relojes Lógicos de Lamport}
+\label{sec:fundamento_lamport}
+
+\subsection{Relación ``sucedió antes'' y concurrencia}
+
+Como los procesos no comparten un reloj físico perfectamente sincronizado, el orden de los eventos se define a partir de la causalidad. La relación ``sucedió antes'' ($\rightarrow$) se cumple cuando: (a) dos eventos ocurren en el mismo proceso y uno es anterior al otro; (b) un evento es el envío de un mensaje y el otro es su recepción; o (c) existe una cadena de eventos que conecta ambos por las reglas anteriores. Si ni $a \rightarrow b$ ni $b \rightarrow a$, los eventos son \emph{concurrentes} ($a \parallel b$): ninguno pudo influir en el otro~\cite{castello2024inductive}.
+
+\subsection{Reglas del reloj de Lamport}
