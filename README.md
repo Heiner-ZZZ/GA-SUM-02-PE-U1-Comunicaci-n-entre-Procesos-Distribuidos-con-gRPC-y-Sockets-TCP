@@ -250,4 +250,6 @@ pdflatex guia1_practica.tex
 
 ## Video de respaldo
 
-*(Pendiente de grabación tras completar la ejecución experimental — se enlazará aquí antes del cierre del 22 de noviembre de 2026).*
+Demostración completa de la práctica experimental con participación de los cuatro integrantes del equipo EJPZ:
+
+- **Enlace al video (YouTube):** https://youtu.be/0eA8QVVscn4
