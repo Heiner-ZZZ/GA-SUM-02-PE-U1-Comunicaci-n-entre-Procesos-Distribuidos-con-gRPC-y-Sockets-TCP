@@ -144,7 +144,7 @@ def render_booktabs_latency_table(
         r"\small",
         r"\begin{tabular}{llrrrrrr}",
         r"\toprule",
-        r"Mecanismo & Tamano & $n$ & Media (ms) & Mediana (ms) & Desv. Est. (ms) & P95 (ms) & Rend. (msg/s) \\",
+        r"Mecanismo & Tamaño & $n$ & Media (ms) & Mediana (ms) & Desv. Est. (ms) & P95 (ms) & Rend. (msg/s) \\",
         r"\midrule",
     ]
     for _, r in summary_df.iterrows():
