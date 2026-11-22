@@ -63,6 +63,9 @@
   }%
 }
 
+% Enlace a un commit del repositorio a partir de su hash corto
+\newcommand{\commit}[1]{\href{https://github.com/Heiner-ZZZ/GA-SUM-02-PE-U1-Comunicaci-n-entre-Procesos-Distribuidos-con-gRPC-y-Sockets-TCP/commit/#1}{\texttt{#1}}}
+
 \begin{document}
 
 \begin{titlepage}
@@ -72,7 +75,7 @@
   {\large Facultad de Ciencias de la Computación y Diseño Digital}\\[0.15cm]
   {\large Carrera de Ingeniería en Software (Rediseño)}\\[1.5cm]
 
-  {\large \textbf{PRÁCTICA EXPERIMENTAL — UNIDAD 1 (GA-SUM-02 / PE-U1)}}\\[0.5cm]
+  {\large \textbf{PRÁCTICA EXPERIMENTAL — UNIDAD 1 (GA-SUM-01 / PE-U1)}}\\[0.5cm]
   {\LARGE \textbf{Comunicación entre Procesos Distribuidos con Sockets TCP y gRPC: Evaluación Empírica y Ordenamiento con Relojes de Lamport}}\\[1.5cm]
 
   \begin{flushleft}
@@ -651,17 +654,115 @@ Programar la pila completa de Sockets TCP (\texttt{framing.py}, \texttt{server.p
 
 Al comparar esas cifras con gRPC, noté dos aspectos decisivos: aunque TCP superó a gRPC en todos los casos, su rendimiento concurrente cayó un 32,0\,\% al subir la carga de 100\,B a 10\,KB, mientras gRPC sostuvo 5\,151,1\,msg/s y redujo su diferencia media de $+$426,77\,\% a $+$190,39\,\%. Además, coordinar envíos paralelos con \texttt{threading.Barrier} confirmó 20/20 (100\,\%) de cumplimiento de $L(\mathrm{recv}) > L(\mathrm{send})$ ($L_{\max}=38$) y generó concurrencia real en $L=1$ (\texttt{ex-01} y \texttt{ex-02}). Por ello, en la Bolsa de Empleos UTEQ prefiero gRPC para la comunicación síncrona entre microservicios por sus contratos tipados y menor carga de mantenimiento, reservando TCP puro para servicios legados de muy bajo nivel.
 
-% PENDIENTE: agregar conclusión individual de Kenny Isaías España Vera.
+\subsubsection*{Kenny Isaías España Vera}
+\addcontentsline{toc}{subsubsection}{Kenny Isaías España Vera}
 
-% ======================================================================
-% PENDIENTE: completar en este mismo archivo
-% ======================================================================
+Definir el contrato \texttt{proto/messaging.proto} e implementar el servidor y el cliente gRPC (\texttt{server\_grpc.py} y \texttt{client\_grpc.py}) me mostró que la ventaja de gRPC no está en la velocidad, sino en lo que el programador deja de hacer. Con un archivo de 49 líneas obtuve los \emph{stubs}, los mensajes tipados y los códigos de error, sin escribir entramado ni validar campos a mano. Sin embargo, esa abstracción tuvo un costo medible en \texttt{localhost}: con 100\,B en modo secuencial, gRPC registró 0,4655\,ms de latencia media frente a 0,0884\,ms de Sockets TCP ($+$426,77\,\%), y su rendimiento fue de 2\,133,2 frente a 10\,860,9\,msg/s. Para que la comparación fuera justa, el cliente gRPC reutiliza la misma secuencia de intercambios y los mismos exportadores CSV que el cliente TCP, espera a que el canal esté listo antes de medir y usa un \emph{pool} de subcanales local para que cada cliente concurrente tenga su propia conexión, como en TCP. Sin esa última decisión, gRPC habría compartido una sola conexión HTTP/2 entre los tres clientes y el escenario concurrente no habría sido comparable.
+
+También aprendí que un sistema distribuido falla por detalles que no aparecen en el diseño. Una prueba que comparaba el reloj máximo entre dos corridas fallaba de forma intermitente porque, cuando \texttt{ex-09} y \texttt{ex-10} llegan a la vez a \texttt{nodo-B}, el valor final depende del orden de llegada; no era un error del código, sino el comportamiento esperado de Lamport con eventos concurrentes. Del mismo modo, al preparar las evidencias, el servidor no arrancaba porque el Python global tenía \texttt{protobuf} 5.29.6 y los \emph{stubs} exigían 7.36.2, lo que confirmó la importancia de fijar versiones en \texttt{requirements.txt} y trabajar con \texttt{.venv}. Finalmente, el script \texttt{analysis/run\_analysis.py} permitió que todas las tablas y gráficos de este informe salgan de las 8\,000 mediciones válidas sin copiar ningún número a mano. Los datos muestran que gRPC escaló 3,52 veces al pasar a tres clientes con 10\,KB (de 1\,464,1 a 5\,151,1\,msg/s), frente a 2,11 veces de TCP. Por eso, para la Bolsa de Empleos UTEQ elegiría gRPC en los enlaces internos síncronos, donde el contrato tipado y los plazos por llamada valen más que la diferencia de medio milisegundo observada en una sola máquina.
+
 \section{Tabla de Aportes}
+\label{sec:aportes}
+
+La Tabla~\ref{tab:aportes} resume el aporte de cada integrante y enlaza todos sus commits en el repositorio. Luis Alberto Paca Pilataza registró commits con dos cuentas de GitHub (\texttt{Luispaca2002} y \texttt{Luis-paca}); ambas corresponden a la misma persona.
+
+\begin{table}[htbp]
+\centering
+\caption{Aportes de cada integrante con enlace a sus commits.}
+\label{tab:aportes}
+\footnotesize
+\renewcommand{\arraystretch}{1.25}
+\begin{tabular}{p{2.9cm}p{7.6cm}p{4.2cm}}
+\toprule
+Integrante & Aportes principales & Commits \\
+\midrule
+Heiner Ariel Zambrano Ronquillo (\texttt{@Heiner-ZZZ}) &
+Creación del repositorio y su estructura; \texttt{requirements.txt}; núcleo común (\texttt{lamport.py}, \texttt{config.py}, \texttt{machine\_info.py}) con pruebas; orquestador experimental \texttt{run\_experiments.py} con \texttt{SHA256SUMS}; verificador \texttt{verify\_lamport.py} con pruebas; referencias de seguridad, fallos y CAP; protocolo, resultados, discusión y Anexo 8 del informe; conclusión individual; evidencia de la verificación de Lamport. &
+\commit{abd94a8}, \commit{54cb88c}, \commit{c89e7ef}, \commit{960b9a7}, \commit{0401a9e}, \commit{262fae6}, \commit{2e59227}, \commit{51bee44} \\
+\midrule
+Luis Jeremy Jaramillo Acosta (\texttt{@JeremyJaramillo72}) &
+Entramado TCP con prefijo de 4 bytes (\texttt{framing.py}); servidor TCP multihilo con reloj de Lamport; cliente TCP con los 20 intercambios, benchmark de 100\,B/10\,KB y concurrencia; pruebas unitarias y de integración de sockets; referencias de sockets, RPC y microservicios; secciones de implementación, protocolo, resultados y discusión; capturas de los tres nodos e intercambio TCP; enlace del video; conclusión individual. &
+\commit{916c2fa}, \commit{e5d1bee}, \commit{fccc331}, \commit{db4d293}, \commit{fe50eae}, \commit{b5c1df9}, \commit{f9e8545}, \commit{5a9e64a}, \commit{3af8654}, \commit{02d314e} \\
+\midrule
+Kenny Isaías España Vera (\texttt{@Kespanav}) &
+Contrato \texttt{messaging.proto} y \emph{stubs}; servidor gRPC con reloj de Lamport y pruebas; cliente gRPC equivalente al de TCP con pruebas de integración; script \texttt{run\_analysis.py} (tablas \texttt{booktabs}, diagrama de cajas, barras con IC 95\,\% y rendimiento) con pruebas; generación de las tablas y gráficos oficiales; referencias de gRPC/Protobuf; actualización de \texttt{README.md} y \texttt{BITACORA.md}; secciones de fundamentos del informe; capturas del intercambio gRPC y del análisis; conclusión individual. &
+\commit{9cdefc8}, \commit{aee8e18}, \commit{bed4aa6}, \commit{a285039}, \commit{28cffb9}, \commit{767b209}, \commit{ee751ad}, \commit{88a1c3c}, \commit{60a1cef}, \commit{79675cb} \\
+\midrule
+Luis Alberto Paca Pilataza (\texttt{@Luispaca2002}) &
+Motor estadístico \texttt{metrics.py} (validación de CSV, descarte de calentamiento, P95, IC 95\,\%, rendimiento y tablas \texttt{booktabs}) con pruebas; plantilla LaTeX, resumen, objetivos e hipótesis previa; corrida experimental oficial de TCP y gRPC con \texttt{SHA256SUMS}; referencias de orden causal y relojes lógicos; integración de las secciones de arquitectura e implementación; verificación de Lamport y conclusiones generales; conclusión individual; evidencia de las corridas oficiales. &
+\commit{1f29a27}, \commit{b8dcbb0}, \commit{d24c405}, \commit{33b44da}, \commit{be1ea25}, \commit{abbcb65}, \commit{f488e14} \\
+\bottomrule
+\end{tabular}
+\end{table}
 
 \section{Declaración de Uso de Inteligencia Artificial}
+\label{sec:declaracion_ia}
+
+El equipo declara que utilizó la herramienta de inteligencia artificial generativa \textbf{Claude} (Anthropic), a través de \textbf{Claude Code}, en las sesiones de trabajo de Kenny Isaías España Vera. Su uso se detalla a continuación:
+
+\begin{itemize}
+  \item \textbf{Código:} generación asistida de \texttt{src/grpc/client\_grpc.py}, \texttt{tests/test\_grpc\_integration.py}, \texttt{analysis/run\_analysis.py} y \texttt{tests/test\_analysis.py}, a partir del protocolo definido por el equipo y del cliente TCP existente.
+  \item \textbf{Informe:} redacción de los borradores de las secciones de fundamentos (Secciones~\ref{sec:fundamento_sd}, \ref{sec:fundamento_comunicacion} y~\ref{sec:fundamento_lamport}), arquitectura (Sección~\ref{sec:arquitectura}, incluido el diagrama TikZ) e implementación (Sección~\ref{sec:implementacion}); estas secciones se incorporaron al informe en los commits \commit{88a1c3c} y \commit{abbcb65}. También redactó el borrador de la conclusión individual de Kenny España, de la tabla de aportes y de esta declaración.
+  \item \textbf{Documentación y revisión:} actualización de \texttt{README.md} y \texttt{BITACORA.md}; comprobación de los 12 DOI de \texttt{referencias.bib} contra los metadatos de Crossref; contraste de los valores citados en el informe con la salida de \texttt{run\_analysis.py} sobre los datos oficiales.
+  \item \textbf{Apoyo operativo:} preparación de los comandos y de un script que abrió las ventanas de \texttt{cmd.exe} para la captura del intercambio gRPC en el equipo de Kenny España. La ejecución y los datos mostrados en la captura son reales.
+\end{itemize}
+
+La inteligencia artificial \textbf{no} generó datos experimentales: todos los archivos de \texttt{/data/} provienen de la ejecución real de \texttt{src/run\_experiments.py}, están protegidos por \texttt{data/SHA256SUMS}, y todas las tablas y gráficos de resultados se generan con los scripts del repositorio. El equipo revisó el código generado, ejecutó las 28 pruebas automatizadas, verificó los resultados frente a los datos crudos y es responsable del contenido final del informe.
+
+% COMPLETAR: si otro integrante usó alguna herramienta de IA (para redactar, programar o revisar),
+% agregarlo aquí indicando la herramienta y en qué parte se usó.
 
 
 \newpage
 \printbibliography[title={Referencias}]
+
+\appendix
+\newpage
+\section{Evidencias de Ejecución}
+\label{anexo:evidencias}
+
+Las siguientes capturas fueron tomadas por cada integrante en su propio equipo durante la ejecución real del sistema. En cada una se observan el usuario, el nombre de la máquina y la fecha y hora del sistema. Los archivos originales están en \texttt{docs/figures/evidencias/}.
+
+\begin{figure}[htbp]
+\centering
+\incluirfigura{0.92\textwidth}{figures/evidencias/jaramillo_nodos_tcp_2026-11-21.png}
+\caption{Tres nodos de Sockets TCP en marcha (Luis Jeremy Jaramillo Acosta, 21/11/2026).}
+\label{fig:ev_jaramillo_nodos}
+\end{figure}
+
+\begin{figure}[htbp]
+\centering
+\incluirfigura{0.92\textwidth}{figures/evidencias/jaramillo_intercambio_tcp_2026-11-21.png}
+\caption{Intercambio con Sockets TCP entre los tres nodos (Luis Jeremy Jaramillo Acosta, 21/11/2026).}
+\label{fig:ev_jaramillo_tcp}
+\end{figure}
+
+\begin{figure}[htbp]
+\centering
+\incluirfigura{0.92\textwidth}{figures/evidencias/espana_intercambio_grpc_2026-11-21.png}
+\caption{Tres nodos gRPC en marcha y 20 intercambios con reloj de Lamport (Kenny Isaías España Vera, 21/11/2026).}
+\label{fig:ev_espana_grpc}
+\end{figure}
+
+\begin{figure}[htbp]
+\centering
+\incluirfigura{0.92\textwidth}{figures/evidencias/espana_run_analysis_2026-11-21.jpeg}
+\caption{Ejecución del script de análisis estadístico \texttt{run\_analysis.py} (Kenny Isaías España Vera, 21/11/2026).}
+\label{fig:ev_espana_analisis}
+\end{figure}
+
+\begin{figure}[htbp]
+\centering
+\incluirfigura{0.92\textwidth}{figures/evidencias/paca_corridas_tcp_grpc_2026-11-19.png}
+\caption{Corrida experimental oficial de Sockets TCP y gRPC con \texttt{run\_experiments.py} (Luis Alberto Paca Pilataza, 19/11/2026).}
+\label{fig:ev_paca_corridas}
+\end{figure}
+
+\begin{figure}[htbp]
+\centering
+\incluirfigura{0.92\textwidth}{figures/evidencias/zambrano_verify_lamport_2026-11-20.jpg}
+\caption{Verificación del reloj de Lamport con \texttt{verify\_lamport.py} sobre los datos oficiales (Heiner Ariel Zambrano Ronquillo, 20/11/2026).}
+\label{fig:ev_zambrano_lamport}
+\end{figure}
 
 \end{document}
