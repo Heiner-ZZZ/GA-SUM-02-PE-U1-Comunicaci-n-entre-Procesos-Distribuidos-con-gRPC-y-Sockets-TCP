@@ -1,8 +1,9 @@
-# GA-SUM-02 / PE-U1 — Comunicación entre Procesos Distribuidos con gRPC y Sockets TCP
+# GA-SUM-01 / PE-U1 — Comunicación entre Procesos Distribuidos con gRPC y Sockets TCP
 
 **Universidad Técnica Estatal de Quevedo (UTEQ)**  
+**Facultad:** Facultad de Ciencias de la Computación  
 **Carrera:** Ingeniería en Software (Rediseño) — 7mo Nivel, Paralelo "A"  
-**Asignatura:** Aplicaciones Distribuidas  
+**Asignatura:** Aplicaciones Distribuidas (`ISR-701`)  
 **Docente:** Dr. Gleiston Cicerón Guerrero Ulloa  
 **Equipo:** EJPZ
 
@@ -58,26 +59,33 @@ Ambos mecanismos implementan **relojes lógicos de Lamport**, ejecutan 20 interc
 │   └── generated/                 # Tablas LaTeX y resúmenes generados por script
 ├── tests/                         # Pruebas unitarias y de integración (28 pruebas: Lamport, TCP, gRPC, análisis)
 └── docs/
-    ├── guia1_practica.tex         # Archivo principal del informe
+    ├── main.tex                   # Archivo principal del informe LaTeX
+    ├── main.pdf                   # Informe compilado (pdflatex -> biber -> pdflatex -> pdflatex)
+    ├── entrega_sga.tex            # Fuente LaTeX de la hoja de entrega para el SGA (1 sola página)
+    ├── entrega_sga.pdf            # Hoja de entrega compilada de 1 sola página con URL en una línea
     ├── referencias.bib            # Bibliografía IEEE verificada con DOI (biblatex/biber)
-    ├── sections/                  # Secciones modulares del informe LaTeX
+    ├── sections/                  # Borradores modulares de secciones del informe
     └── figures/
-        └── evidencias/            # Capturas de ejecución de los cuatro integrantes
+        ├── boxplot_latencias.png  # Diagrama de cajas de latencias RTT (300 DPI)
+        ├── barras_latencia_ic95.png # Latencia media con IC 95 % (300 DPI)
+        ├── barras_rendimiento.png # Rendimiento en mensajes/s (300 DPI)
+        └── evidencias/            # 6 capturas reales de ejecución de los cuatro integrantes
 ```
 
-### Estado actual (20 de noviembre de 2026)
+### Estado actual (22 de noviembre de 2026)
 
 | Módulo | Estado |
 |---|---|
-| Núcleo común (`src/common/`): reloj de Lamport, configuración de nodos, registro de la máquina | Implementado y probado |
-| Orquestador experimental (`src/run_experiments.py`) | Implementado y ejecutado |
-| Sockets TCP (`src/sockets/`): framing, servidor y cliente | Implementado y probado |
-| gRPC (`proto/`, `src/grpc/`): contrato `.proto`, stubs, servidor y cliente | Implementado y probado |
-| Motor estadístico y tablas `booktabs` (`analysis/metrics.py`) | Implementado y probado |
-| Script de análisis con gráficos (`analysis/run_analysis.py`) | Implementado y probado (pendiente subir tablas/gráficos en `analysis/generated/` y `docs/figures/`) |
-| Corridas experimentales en `/data/` + `SHA256SUMS` | Completado (commit [`33b44da`](https://github.com/Heiner-ZZZ/GA-SUM-02-PE-U1-Comunicaci-n-entre-Procesos-Distribuidos-con-gRPC-y-Sockets-TCP/commit/33b44dacb02eebe1e3659a9c3ce2443be8ca5708)) |
+| Núcleo común (`src/common/`): reloj de Lamport, configuración de nodos, registro de la máquina | Completado y probado (`28/28` pruebas `unittest` OK) |
+| Orquestador experimental (`src/run_experiments.py`) | Completado y ejecutado |
+| Sockets TCP (`src/sockets/`): framing, servidor y cliente | Completado y probado |
+| gRPC (`proto/`, `src/grpc/`): contrato `.proto`, stubs, servidor y cliente | Completado y probado |
+| Motor estadístico y tablas `booktabs` (`analysis/metrics.py`) | Completado y probado |
+| Script de análisis con gráficos (`analysis/run_analysis.py`) | Completado: tablas en `analysis/generated/` y 3 gráficos a 300 DPI en `docs/figures/` (commit [`60a1cef`](https://github.com/Heiner-ZZZ/GA-SUM-02-PE-U1-Comunicaci-n-entre-Procesos-Distribuidos-con-gRPC-y-Sockets-TCP/commit/60a1cef)) |
+| Corridas experimentales en `/data/` + `SHA256SUMS` | Completado (`7/7` sumas SHA-256 verificadas, commit [`33b44da`](https://github.com/Heiner-ZZZ/GA-SUM-02-PE-U1-Comunicaci-n-entre-Procesos-Distribuidos-con-gRPC-y-Sockets-TCP/commit/33b44dacb02eebe1e3659a9c3ce2443be8ca5708)) |
 | Verificación de Lamport sobre los CSV reales (`analysis/verify_lamport.py`) | Completado (`20/20` en TCP y gRPC, commit [`2e59227`](https://github.com/Heiner-ZZZ/GA-SUM-02-PE-U1-Comunicaci-n-entre-Procesos-Distribuidos-con-gRPC-y-Sockets-TCP/commit/2e59227)) |
-| Informe LaTeX (`docs/`) | En progreso (`01_resumen_objetivos`, `07_protocolo_resultados_discusion`, `09_conclusion_zambrano`) |
+| Evidencias de autoría (`docs/figures/evidencias/` + video de respaldo) | Completado (`6/6` capturas reales de los 4 integrantes + video en YouTube) |
+| Informe LaTeX (`docs/main.tex` → `docs/main.pdf` y `docs/entrega_sga.pdf`) | Completado y compilado reproduciblemente |
 
 ---
 
@@ -235,17 +243,26 @@ Comprueba `L(recv) > L(send)` en todos los mensajes, verifica que el reloj no se
 
 ---
 
-## Compilación del informe LaTeX (al completar `/docs/`)
+## Compilación del informe LaTeX
 
-Compilador requerido: **TeX Live 2023+ / MiKTeX 23+** con `pdflatex` y `biber` (paquetes: `amsmath`, `booktabs`, `listings`, `graphicx`, `tikz`, `biblatex`, `hyperref`, `babel`, `geometry`).
+- **Compilador requerido:** TeX Live 2023+ / MiKTeX 23+ (probado también con Docker `texlive/texlive:latest`) usando `pdflatex` y `biber`.
+- **Archivo principal:** `docs/main.tex` (genera `docs/main.pdf` incluyendo automáticamente las tablas en `analysis/generated/*.tex` y los gráficos/evidencias en `docs/figures/`).
+- **Dependencias de paquetes LaTeX:** `inputenc`, `fontenc`, `babel` (`spanish`, `es-tabla`), `geometry`, `newtxtext`, `newtxmath`, `amsmath`, `array`, `booktabs`, `graphicx`, `listings`, `xcolor`, `tikz`, `csquotes`, `microtype`, `xurl`, `biblatex` (`style=ieee`, `backend=biber`) y `hyperref`.
 
 Desde el directorio `docs/`:
 
 ```bat
-pdflatex guia1_practica.tex
-biber guia1_practica
-pdflatex guia1_practica.tex
-pdflatex guia1_practica.tex
+pdflatex main.tex
+biber main
+pdflatex main.tex
+pdflatex main.tex
+```
+
+Para regenerar la hoja de entrega de una sola página para el SGA (`docs/entrega_sga.pdf`), desde `docs/`:
+
+```bat
+pdflatex entrega_sga.tex
+pdflatex entrega_sga.tex
 ```
 
 ---

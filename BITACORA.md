@@ -1,7 +1,7 @@
 # Bitácora del Equipo EJPZ — PE-U1
 
-**Asignatura:** Aplicaciones Distribuidas (7mo Nivel – Paralelo A)  
-**Actividad:** GA-SUM-02 / PE-U1 — Comunicación entre Procesos Distribuidos con gRPC y Sockets TCP  
+**Asignatura:** Aplicaciones Distribuidas (`ISR-701`, 7mo Nivel – Paralelo A)  
+**Actividad:** GA-SUM-01 / PE-U1 — Comunicación entre Procesos Distribuidos con gRPC y Sockets TCP  
 **Equipo:** EJPZ (Jaramillo, España, Zambrano, Paca)
 
 ---
@@ -59,19 +59,37 @@
 
 ## Sesión 3 — Viernes 20 de noviembre de 2026
 
-- **Asistentes:** Heiner Zambrano *(sesión en curso; los demás integrantes registrarán sus aportes del día al integrar sus módulos)*.
+- **Asistentes:** Heiner Zambrano, Kenny España, Luis Paca, Luis Jeremy Jaramillo.
 - **Horario y horas trabajadas:**
-  - **Bloque mañana/mediodía (`10:30 – 13:10` | 2 h 40 min):** Zambrano sincronizó las corridas de `data/`, revisó los requisitos de evidencias y documentación LaTeX, ejecutó la verificación de relojes lógicos de Lamport sobre los CSV publicados (`12:51`) y registró su captura de autoría en `cmd.exe` (commit `2e59227`, `13:17`).
-  - **Total de la sesión (parcial):** 5 h 00 min (tiempo acumulado del proyecto: 20 h 40 min).
+  - **Bloque mañana/mediodía (`10:30 – 15:40` | 5 h 00 min):** Zambrano sincronizó las corridas de `data/`, ejecutó la verificación de relojes lógicos de Lamport sobre los CSV publicados (`12:51`), registró su captura de autoría en `cmd.exe` (`2e59227`) y redactó `07_protocolo_resultados_discusion.tex` y `09_conclusion_zambrano.tex` (`51bee44`).
+  - **Bloque noche (`22:55 – 23:35` | 40 min):** España consolidó la base de `docs/main.tex` con las secciones de resumen, objetivos y fundamentos (`ee751ad`, `88a1c3c`); Paca agregó limitaciones de Lamport, arquitectura e inicio de implementación (`abbcb65`); y Jaramillo completó implementación e integró protocolo, resultados y discusión (`f9e8545`).
+  - **Total de la sesión:** 5 h 40 min (tiempo acumulado del proyecto: 21 h 20 min).
 - **Trabajo realizado:**
   - **Zambrano — verificación de Lamport y evidencia (`10:30 – 13:10`, commit `2e59227`):** Ejecución real de `python -m analysis.verify_lamport` sobre `data/events_sockets.csv` y `data/events_grpc.csv` en Windows 11 (`HP`, usuario `hp\heiner`, `20/11/2026 12:51`). Se confirmó **20/20 (100,0 %)** cumplimiento de `L(recv) > L(send)` y avance estricto del reloj en cada nodo (`L_max = 38`), así como dos pares reales de eventos concurrentes con igual valor de reloj en nodos distintos (`L = 1`: `ex-01` en `nodo-A` || `ex-02` en `nodo-B`; `L = 15`: `ex-09` en `nodo-A` || `ex-08` en `nodo-C`). Se generaron `analysis/generated/tabla_lamport.tex` y `analysis/generated/verificacion_lamport.json`, y se guardó la captura real en `docs/figures/evidencias/zambrano_verify_lamport_2026-11-20.jpg`.
-  - **Zambrano — protocolo, resultados, discusión PFC-CAP, Anexo 8 y conclusión individual (`13:20 – 15:40`):** Actualización del orden de integrantes y responsabilidades en `README.md` (asignando compilación a Jaramillo). Redacción de `docs/sections/07_protocolo_resultados_discusion.tex` documentando el entorno real de `data/machine_info.json`, enlaces `\input` a las tablas de `analysis.run_analysis` y gráficos a 300 DPI, contraste con la hipótesis previa, amenazas a la validez y las 4 preguntas del Anexo 8 (convergencia con datos reales, elección TCP vs. gRPC en el PFC *Bolsa de Empleos UTEQ* bajo CAP, fallo de nodo y transparencias ANSA). Redacción de `docs/sections/09_conclusion_zambrano.tex` (231 palabras) y validación de compilación local (`pdflatex` + `biber`, 0 errores).
+  - **Zambrano — protocolo, resultados, discusión PFC-CAP, Anexo 8 y conclusión individual (`13:20 – 15:40`, commit `51bee44`):** Actualización del orden de integrantes y responsabilidades en `README.md`. Redacción de `docs/sections/07_protocolo_resultados_discusion.tex` documentando el entorno real de `data/machine_info.json`, enlaces a las tablas de `analysis.run_analysis` y gráficos a 300 DPI, contraste con la hipótesis previa, amenazas a la validez y las 4 preguntas del Anexo 8. Redacción de `docs/sections/09_conclusion_zambrano.tex` (231 palabras).
+  - **España, Paca y Jaramillo — integración progresiva en `docs/main.tex` (`22:55 – 23:35`, commits `88a1c3c`, `abbcb65`, `f9e8545`):** Unificación del informe completo en `docs/main.tex` con macros seguras `\incluirtabla` e `\incluirfigura`, diagrama TikZ, listados de código real (`lamport.py`, `framing.py`, `server_grpc.py`, barrera y RTT) e integración de resultados y discusión.
 - **Problemas encontrados y solución:**
   - *Hora del sistema en la captura de evidencia:* Una primera captura en `cmd.exe` mostraba usuario, equipo y fecha pero omitía la hora. Se repitió con `whoami & hostname & date /t & time /t` (`12:51`) para cumplir íntegramente los criterios de evidencia de autoría.
   - *Protección de `data/SHA256SUMS` en capturas de nodos en vivo:* Se definió que cualquier ejecución demostrativa de los clientes TCP/gRPC para capturas redirija los CSV a `%TEMP%` (`--events-csv`) para no sobrescribir los datos crudos de `/data/`.
   - *Conflicto de `babel[spanish]` con `\%` en modo matemático:* Al probar la compilación con `pdflatex`, usar `\%` dentro de `$...$` produjo el error `Incompatible glue units`. Solución: colocar `\%` fuera de modo matemático y emplear `\operatorname{max}` para evitar acentos desplazados en `newtxmath`.
-  - *Ancho de `tabla_comparacion.tex` en LaTeX:* Durante la compilación de prueba se observó que la tabla generada por `analysis/run_analysis.py` sobresale del margen derecho con `\small` debido a `Concurrente (3 clientes)`; se registró el ajuste a `\footnotesize` pendiente antes de la compilación final.
+  - *Ancho de `tabla_comparacion.tex` en LaTeX:* Durante la compilación de prueba se observó que la tabla generada por `analysis/run_analysis.py` sobresalía del margen derecho con `\small`; se registró el ajuste a `\footnotesize` aplicado en la Sesión 4.
 - **Próximos pasos:**
-  - Ejecutar `python -m analysis.run_analysis` sobre los CSV de `/data/` para publicar las tablas `booktabs` y los 3 gráficos a 300 DPI.
-  - Completar las 4 capturas restantes en `docs/figures/evidencias/` (3 nodos en marcha, intercambio TCP, intercambio gRPC y análisis estadístico).
-  - Redactar e integrar las secciones restantes en `docs/sections/`, compilar `docs/guia1_practica.pdf`, generar `docs/entrega_sga.pdf` (1 sola página) y grabar el video de respaldo (3–5 min).
+  - Ejecutar `python -m analysis.run_analysis` sobre los CSV oficiales para publicar tablas y gráficos 300 DPI, completar las 4 capturas restantes, cerrar `docs/main.tex`, grabar el video de respaldo y compilar `docs/main.pdf` y `docs/entrega_sga.pdf`.
+
+---
+
+## Sesión 4 — Sábado 21 y Domingo 22 de noviembre de 2026
+
+- **Asistentes:** Kenny España, Luis Paca, Luis Jeremy Jaramillo, Heiner Zambrano.
+- **Horario y horas trabajadas:**
+  - **Bloque noche 21/11 (`20:30 – 23:59` | 3 h 30 min):** Generación oficial de tablas y gráficos (`60a1cef`), toma de las 4 capturas faltantes en `cmd.exe` (`79675cb`, `5a9e64a`), cierre de Verificación de Lamport, Conclusiones individuales, Tabla de Aportes y Declaración de IA (`f488e14`, `02d314e`, `f843e66`), aclaración de cuentas de Paca (`8fa46f8`) y grabación/publicación del video de respaldo (`3af8654`).
+  - **Bloque verificación y compilación final 22/11 (`00:30 – 00:50` | 20 min):** Auditoría final de compilación reproducible en Docker (`texlive/texlive:latest`), corrección de `docs/main.pdf` completo (eliminando recuadros de tabla/figura pendiente y desbordes horizontales), alineación de `README.md` hacia `docs/main.tex` y generación de `docs/entrega_sga.pdf` de una sola página.
+  - **Total de la sesión:** 3 h 50 min (tiempo acumulado del proyecto: 25 h 10 min).
+- **Trabajo realizado:**
+  - **España (`60a1cef`, `79675cb`, `f843e66`):** Ajustó `tabla_comparacion.tex` a `\footnotesize` en `analysis/run_analysis.py`, ejecutó el análisis oficial generando los 5 archivos en `analysis/generated/` y los 3 gráficos a 300 DPI en `docs/figures/`, tomó sus capturas reales de gRPC (`espana_intercambio_grpc_2026-11-21.png`) y del análisis (`espana_run_analysis_2026-11-21.jpeg`) y agregó su conclusión individual, la Tabla de Aportes y el Anexo de Evidencias en `docs/main.tex`.
+  - **Paca (`f488e14`, `8fa46f8`):** Corrigió la tilde `Tamaño` en `analysis/metrics.py`, redactó `\section{Verificación del Reloj de Lamport}` y `\section{Conclusiones}` (generales cuantificadas + conclusión individual) y documentó la aclaración de sus dos cuentas GitHub (`@Luis-paca` / `@Luispaca2002`).
+  - **Jaramillo (`5a9e64a`, `3af8654`, `02d314e`):** Ejecutó la suite `28/28` en `.venv` (10,2 s), tomó sus 2 capturas reales TCP (`jaramillo_nodos_tcp_2026-11-21.png` y `jaramillo_intercambio_tcp_2026-11-21.png`) con salida a `%TEMP%` preservando `data/SHA256SUMS` (`7/7 OK`), publicó el enlace del video grupal de respaldo (`https://youtu.be/0eA8QVVscn4`) en `README.md` y redactó su conclusión individual.
+  - **Cierre final reproducible:** Se depuró `docs/main.tex` (facultad oficial, evolución desde `FORM-TL-01`, Declaración de IA con versiones y alcance verificable, eliminación de comentarios pendientes y ajuste tipográfico en `\incluirtabla`), se actualizó `README.md` apuntando a `docs/main.tex` y se compilaron `docs/main.pdf` y `docs/entrega_sga.pdf` con 0 errores y 0 citas sin resolver.
+- **Problemas encontrados y solución:**
+  - *Primera toma de capturas TCP sin ejecutar:* Al pegar el bloque multilínea en `cmd.exe`, la última línea quedó esperando `Enter`; se reejecutaron las 4 ventanas verificando la salida completa `Servidor TCP escuchando...` y los 20 mensajes `RECV` antes de guardar las evidencias.
+  - *PDF compilado en Overleaf sin carpetas de figuras/tablas (`3ad7f0b`):* El primer `docs/main.pdf` (306 KB) mostraba recuadros de *"Tabla/Figura pendiente"* al haberse compilado sin `analysis/generated/` ni `docs/figures/`. Se recompiló íntegramente desde el repositorio local con `texlive/texlive:latest` (`pdflatex → biber → pdflatex → pdflatex`), verificando la inclusión real de todas las tablas `booktabs`, los 3 gráficos a 300 DPI y las 6 capturas de evidencias, y actualizando `README.md` para corregir `guia1_practica.tex` → `main.tex`.

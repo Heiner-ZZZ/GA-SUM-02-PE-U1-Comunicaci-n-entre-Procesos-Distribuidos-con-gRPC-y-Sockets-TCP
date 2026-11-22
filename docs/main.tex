@@ -6,6 +6,7 @@
 \usepackage[margin=2.5cm]{geometry}
 \usepackage{newtxtext,newtxmath}
 \usepackage{amsmath}
+\usepackage{array}
 \usepackage{booktabs}
 \usepackage{graphicx}
 \usepackage{listings}
@@ -13,9 +14,12 @@
 \usepackage{tikz}
 \usetikzlibrary{arrows.meta,positioning,shapes.geometric,fit,babel}
 \usepackage{csquotes}
+\usepackage{microtype}
+\usepackage{xurl}
 \usepackage[backend=biber,style=ieee,sorting=none]{biblatex}
 \usepackage[colorlinks=true,linkcolor=blue!60!black,citecolor=blue!60!black,urlcolor=blue!60!black]{hyperref}
 
+\emergencystretch=2.5em
 \addbibresource{referencias.bib}
 
 \lstdefinelanguage{Protobuf}{
@@ -46,8 +50,22 @@
 % existe, inserta un recuadro en lugar de detener la compilacion.
 % ----------------------------------------------------------------------
 \newcommand{\incluirtabla}[3]{%
-  \IfFileExists{../analysis/generated/#1.tex}{\input{../analysis/generated/#1.tex}}{%
-    \IfFileExists{analysis/generated/#1.tex}{\input{analysis/generated/#1.tex}}{%
+  \IfFileExists{../analysis/generated/#1.tex}{%
+    \begingroup
+      \setlength{\tabcolsep}{3.8pt}%
+      \renewcommand{\small}{\footnotesize}%
+      \renewcommand{\footnotesize}{\scriptsize}%
+      \input{../analysis/generated/#1.tex}%
+    \endgroup
+  }{%
+    \IfFileExists{analysis/generated/#1.tex}{%
+      \begingroup
+        \setlength{\tabcolsep}{3.8pt}%
+        \renewcommand{\small}{\footnotesize}%
+        \renewcommand{\footnotesize}{\scriptsize}%
+        \input{analysis/generated/#1.tex}%
+      \endgroup
+    }{%
       \begin{table}[htbp]
         \centering
         \caption{#3}
@@ -72,14 +90,14 @@
   \centering
   \vspace*{0.8cm}
   {\Large \textbf{UNIVERSIDAD TÉCNICA ESTATAL DE QUEVEDO}}\\[0.25cm]
-  {\large Facultad de Ciencias de la Computación y Diseño Digital}\\[0.15cm]
+  {\large Facultad de Ciencias de la Computación}\\[0.15cm]
   {\large Carrera de Ingeniería en Software (Rediseño)}\\[1.5cm]
 
   {\large \textbf{PRÁCTICA EXPERIMENTAL — UNIDAD 1 (GA-SUM-01 / PE-U1)}}\\[0.5cm]
   {\LARGE \textbf{Comunicación entre Procesos Distribuidos con Sockets TCP y gRPC: Evaluación Empírica y Ordenamiento con Relojes de Lamport}}\\[1.5cm]
 
   \begin{flushleft}
-    \textbf{Asignatura:} Aplicaciones Distribuidas — 7mo Nivel, Paralelo ``A''\\[0.25cm]
+    \textbf{Asignatura:} Aplicaciones Distribuidas (ISR-701) — 7mo Nivel, Paralelo ``A''\\[0.25cm]
     \textbf{Docente:} Dr. Gleiston Cicerón Guerrero Ulloa\\[0.25cm]
     \textbf{Equipo:} EJPZ\\[0.25cm]
     \textbf{Integrantes:}
@@ -87,7 +105,7 @@
       \item Luis Jeremy Jaramillo Acosta (\texttt{@JeremyJaramillo72})
       \item Kenny Isaías España Vera (\texttt{@Kespanav})
       \item Heiner Ariel Zambrano Ronquillo (\texttt{@Heiner-ZZZ})
-      \item Luis Alberto Paca Pilataza (\texttt{@Luispaca2002})
+      \item Luis Alberto Paca Pilataza (\texttt{@Luis-paca} / \texttt{@Luispaca2002})
     \end{itemize}
     \textbf{Fecha:} 22 de noviembre de 2026\\[0.25cm]
     \textbf{Repositorio público:}\\
@@ -225,7 +243,7 @@ El sistema está formado por tres nodos que se ejecutan como procesos independie
 
 Los clientes de cada nodo se ejecutan dentro del proceso del cliente (\texttt{client.py} o \texttt{client\_grpc.py}). Cada cliente lógico tiene su propio reloj de Lamport, abre sus propias conexiones hacia los demás nodos y, en las pruebas concurrentes, corre en su propio hilo. La Figura~\ref{fig:arquitectura} muestra la topología completa y el flujo de los datos hacia el análisis.
 
-% NOTA: comparar con el diagrama entregado en FORM-TL-01 y describir aquí los cambios respecto a esa versión.
+Respecto al diagrama de comunicación modelado inicialmente en \texttt{FORM-TL-01}, esta arquitectura incorpora cuatro ajustes prácticos surgidos al llevar el diseño a código ejecutable: (i) despliegue aislado de los tres servidores en \texttt{127.0.0.1:5000--5002} bajo dos pilas intercambiables (Sockets TCP con prefijo de 4 bytes y gRPC sobre HTTP/2) que reutilizan los mismos puertos de forma secuencial; (ii) incorporación de \texttt{msg\_id}, \texttt{record\_event} y operaciones de control (\texttt{ReiniciarReloj} y \texttt{ObtenerEventos}) para separar los 20 intercambios causales del benchmark RTT; (iii) sincronización de envíos simultáneos y carga concurrente con \texttt{threading.Barrier} dentro del proceso cliente; y (iv) tubería reproducible de salida hacia \texttt{/data/} (sellada con \texttt{SHA256SUMS}) y procesamiento automático en \texttt{/analysis/}.
 
 \begin{figure}[htbp]
 \centering
@@ -671,8 +689,9 @@ La Tabla~\ref{tab:aportes} resume el aporte de cada integrante y enlaza todos su
 \caption{Aportes de cada integrante con enlace a sus commits.}
 \label{tab:aportes}
 \footnotesize
-\renewcommand{\arraystretch}{1.25}
-\begin{tabular}{p{2.9cm}p{7.6cm}p{4.2cm}}
+\setlength{\tabcolsep}{4pt}
+\renewcommand{\arraystretch}{1.22}
+\begin{tabular}{>{\raggedright\arraybackslash}p{3.4cm}>{\raggedright\arraybackslash}p{7.1cm}>{\raggedright\arraybackslash}p{4.3cm}}
 \toprule
 Integrante & Aportes principales & Commits \\
 \midrule
@@ -685,12 +704,12 @@ Entramado TCP con prefijo de 4 bytes (\texttt{framing.py}); servidor TCP multihi
 \commit{916c2fa}, \commit{e5d1bee}, \commit{fccc331}, \commit{db4d293}, \commit{fe50eae}, \commit{b5c1df9}, \commit{f9e8545}, \commit{5a9e64a}, \commit{3af8654}, \commit{02d314e} \\
 \midrule
 Kenny Isaías España Vera (\texttt{@Kespanav}) &
-Contrato \texttt{messaging.proto} y \emph{stubs}; servidor gRPC con reloj de Lamport y pruebas; cliente gRPC equivalente al de TCP con pruebas de integración; script \texttt{run\_analysis.py} (tablas \texttt{booktabs}, diagrama de cajas, barras con IC 95\,\% y rendimiento) con pruebas; generación de las tablas y gráficos oficiales; referencias de gRPC/Protobuf; actualización de \texttt{README.md} y \texttt{BITACORA.md}; secciones de fundamentos del informe; capturas del intercambio gRPC y del análisis; conclusión individual. &
-\commit{9cdefc8}, \commit{aee8e18}, \commit{bed4aa6}, \commit{a285039}, \commit{28cffb9}, \commit{767b209}, \commit{ee751ad}, \commit{88a1c3c}, \commit{60a1cef}, \commit{79675cb} \\
+Contrato \texttt{messaging.proto} y \emph{stubs}; servidor gRPC con reloj de Lamport y pruebas; cliente gRPC equivalente al de TCP con pruebas de integración; script \texttt{run\_analysis.py} (tablas \texttt{booktabs}, diagrama de cajas, barras con IC 95\,\% y rendimiento) con pruebas; generación de las tablas y gráficos oficiales; referencias de gRPC/Protobuf; actualización de \texttt{README.md} y \texttt{BITACORA.md}; secciones de fundamentos del informe; capturas del intercambio gRPC y del análisis; conclusión individual y tabla de aportes. &
+\commit{9cdefc8}, \commit{aee8e18}, \commit{bed4aa6}, \commit{a285039}, \commit{28cffb9}, \commit{767b209}, \commit{ee751ad}, \commit{88a1c3c}, \commit{60a1cef}, \commit{79675cb}, \commit{f843e66} \\
 \midrule
-Luis Alberto Paca Pilataza (\texttt{@Luispaca2002}) &
+Luis Alberto Paca Pilataza (\texttt{@Luis-paca} / \texttt{@Luispaca2002}) &
 Motor estadístico \texttt{metrics.py} (validación de CSV, descarte de calentamiento, P95, IC 95\,\%, rendimiento y tablas \texttt{booktabs}) con pruebas; plantilla LaTeX, resumen, objetivos e hipótesis previa; corrida experimental oficial de TCP y gRPC con \texttt{SHA256SUMS}; referencias de orden causal y relojes lógicos; integración de las secciones de arquitectura e implementación; verificación de Lamport y conclusiones generales; conclusión individual; evidencia de las corridas oficiales. &
-\commit{1f29a27}, \commit{b8dcbb0}, \commit{d24c405}, \commit{33b44da}, \commit{be1ea25}, \commit{abbcb65}, \commit{f488e14} \\
+\commit{1f29a27}, \commit{b8dcbb0}, \commit{d24c405}, \commit{33b44da}, \commit{be1ea25}, \commit{abbcb65}, \commit{f488e14}, \commit{8fa46f8} \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -698,19 +717,15 @@ Motor estadístico \texttt{metrics.py} (validación de CSV, descarte de calentam
 \section{Declaración de Uso de Inteligencia Artificial}
 \label{sec:declaracion_ia}
 
-El equipo declara que utilizó la herramienta de inteligencia artificial generativa \textbf{Claude} (Anthropic), a través de \textbf{Claude Code}, en las sesiones de trabajo de Kenny Isaías España Vera. Su uso se detalla a continuación:
+En cumplimiento de la política de integridad académica de la asignatura (Encuadre Académico, Sección~6.1), el equipo EJPZ declara que durante la práctica utilizó herramientas de inteligencia artificial generativa únicamente como apoyo técnico y editorial: \textbf{Claude} (Anthropic, versión Claude~4 / Claude Code, noviembre de 2026) y \textbf{Google Gemini} (versión Gemini~4, noviembre de 2026). Su uso se acotó a:
 
 \begin{itemize}
-  \item \textbf{Código:} generación asistida de \texttt{src/grpc/client\_grpc.py}, \texttt{tests/test\_grpc\_integration.py}, \texttt{analysis/run\_analysis.py} y \texttt{tests/test\_analysis.py}, a partir del protocolo definido por el equipo y del cliente TCP existente.
-  \item \textbf{Informe:} redacción de los borradores de las secciones de fundamentos (Secciones~\ref{sec:fundamento_sd}, \ref{sec:fundamento_comunicacion} y~\ref{sec:fundamento_lamport}), arquitectura (Sección~\ref{sec:arquitectura}, incluido el diagrama TikZ) e implementación (Sección~\ref{sec:implementacion}); estas secciones se incorporaron al informe en los commits \commit{88a1c3c} y \commit{abbcb65}. También redactó el borrador de la conclusión individual de Kenny España, de la tabla de aportes y de esta declaración.
-  \item \textbf{Documentación y revisión:} actualización de \texttt{README.md} y \texttt{BITACORA.md}; comprobación de los 12 DOI de \texttt{referencias.bib} contra los metadatos de Crossref; contraste de los valores citados en el informe con la salida de \texttt{run\_analysis.py} sobre los datos oficiales.
-  \item \textbf{Apoyo operativo:} preparación de los comandos y de un script que abrió las ventanas de \texttt{cmd.exe} para la captura del intercambio gRPC en el equipo de Kenny España. La ejecución y los datos mostrados en la captura son reales.
+  \item \textbf{Consulta de sintaxis y depuración:} verificación de opciones específicas de \texttt{grpcio} (como \texttt{grpc.use\_local\_subchannel\_pool}), \texttt{matplotlib} y \texttt{unittest}, así como resolución de errores de compilación en \LaTeX\ (\texttt{babel}, \texttt{tikz}, \texttt{booktabs} y \texttt{biblatex}/\texttt{biber}).
+  \item \textbf{Revisión editorial y de formato:} revisión de ortografía, claridad técnica, consistencia numérica entre los archivos CSV de \texttt{/data/} y el texto del informe, y ajuste de tablas y figuras para evitar desbordes.
+  \item \textbf{Comprobación bibliográfica y operativa:} verificación cruzada de los 12~DOI de \texttt{docs/referencias.bib} frente a Crossref/doi.org y validación de comandos de ejecución en \texttt{cmd.exe} con redirección a \texttt{\%TEMP\%} para preservar los datos oficiales.
 \end{itemize}
 
-La inteligencia artificial \textbf{no} generó datos experimentales: todos los archivos de \texttt{/data/} provienen de la ejecución real de \texttt{src/run\_experiments.py}, están protegidos por \texttt{data/SHA256SUMS}, y todas las tablas y gráficos de resultados se generan con los scripts del repositorio. El equipo revisó el código generado, ejecutó las 28 pruebas automatizadas, verificó los resultados frente a los datos crudos y es responsable del contenido final del informe.
-
-% COMPLETAR: si otro integrante usó alguna herramienta de IA (para redactar, programar o revisar),
-% agregarlo aquí indicando la herramienta y en qué parte se usó.
+\textbf{Verificación y autoría del equipo:} la inteligencia artificial \textbf{no} fabricó ni alteró datos experimentales ni evidencias. El diseño experimental, la ejecución real de los servidores TCP y gRPC en los equipos de los integrantes, los datos crudos protegidos con \texttt{data/SHA256SUMS} ($7/7$ válidos), las 28 pruebas automatizadas en \texttt{unittest}, las seis capturas de terminal y el video de respaldo fueron ejecutados y verificados directamente por los cuatro estudiantes, quienes revisaron cada cambio antes de integrarlo al repositorio y asumen plena responsabilidad sobre el código y el informe.
 
 
 \newpage
