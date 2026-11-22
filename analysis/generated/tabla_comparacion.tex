@@ -1,0 +1,16 @@
+\begin{table}[htbp]
+\centering
+\caption{Variación porcentual de gRPC respecto a Sockets TCP (valores positivos favorecen a gRPC)}
+\label{tab:comparacion_relativa}
+\footnotesize
+\begin{tabular}{llrrrrr}
+\toprule
+Modo & Tamaño & TCP media (ms) & gRPC media (ms) & $\Delta$ media (\%) & $\Delta$ P95 (\%) & $\Delta$ rend. (\%) \\
+\midrule
+Concurrente (3 clientes) & 100B & 0.1329 & 0.6007 & -352.15 & -379.12 & -75.97 \\
+Concurrente (3 clientes) & 10KB & 0.1988 & 0.5774 & -190.39 & -189.95 & -64.66 \\
+Secuencial & 100B & 0.0884 & 0.4655 & -426.77 & -380.49 & -80.36 \\
+Secuencial & 10KB & 0.1410 & 0.6757 & -379.12 & -374.56 & -78.77 \\
+\bottomrule
+\end{tabular}
+\end{table}

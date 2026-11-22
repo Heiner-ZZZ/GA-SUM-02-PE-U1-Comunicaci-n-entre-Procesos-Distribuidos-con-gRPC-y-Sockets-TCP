@@ -1,0 +1,16 @@
+\begin{table}[htbp]
+\centering
+\caption{Latencia RTT y rendimiento por mecanismo y tamaño -- modo concurrente (3 clientes)}
+\label{tab:latencias_concurrent}
+\small
+\begin{tabular}{llrrrrrr}
+\toprule
+Mecanismo & Tamano & $n$ & Media (ms) & Mediana (ms) & Desv. Est. (ms) & P95 (ms) & Rend. (msg/s) \\
+\midrule
+gRPC & 100B & 1500 & 0.6007 & 0.5187 & 0.2951 & 0.9789 & 5153.6 \\
+gRPC & 10KB & 1500 & 0.5774 & 0.5285 & 0.1592 & 0.8823 & 5151.1 \\
+Sockets TCP & 100B & 1500 & 0.1329 & 0.1192 & 0.0600 & 0.2043 & 21449.7 \\
+Sockets TCP & 10KB & 1500 & 0.1988 & 0.1836 & 0.0570 & 0.3043 & 14577.6 \\
+\bottomrule
+\end{tabular}
+\end{table}

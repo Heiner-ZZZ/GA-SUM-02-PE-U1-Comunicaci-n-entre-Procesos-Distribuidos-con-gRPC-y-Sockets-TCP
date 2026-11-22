@@ -65,7 +65,7 @@ def render_comparison_table(comparison_df: pd.DataFrame) -> str:
         r"\centering",
         r"\caption{Variación porcentual de gRPC respecto a Sockets TCP (valores positivos favorecen a gRPC)}",
         r"\label{tab:comparacion_relativa}",
-        r"\small",
+        r"\footnotesize",
         r"\begin{tabular}{llrrrrr}",
         r"\toprule",
         r"Modo & Tamaño & TCP media (ms) & gRPC media (ms) & $\Delta$ media (\%) & $\Delta$ P95 (\%) & $\Delta$ rend. (\%) \\",

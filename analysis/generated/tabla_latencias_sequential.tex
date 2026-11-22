@@ -1,0 +1,16 @@
+\begin{table}[htbp]
+\centering
+\caption{Latencia RTT y rendimiento por mecanismo y tamaño -- modo secuencial}
+\label{tab:latencias_sequential}
+\small
+\begin{tabular}{llrrrrrr}
+\toprule
+Mecanismo & Tamano & $n$ & Media (ms) & Mediana (ms) & Desv. Est. (ms) & P95 (ms) & Rend. (msg/s) \\
+\midrule
+gRPC & 100B & 500 & 0.4655 & 0.4398 & 0.0928 & 0.6317 & 2133.2 \\
+gRPC & 10KB & 500 & 0.6757 & 0.6445 & 0.1607 & 0.9781 & 1464.1 \\
+Sockets TCP & 100B & 500 & 0.0884 & 0.0779 & 0.0221 & 0.1315 & 10860.9 \\
+Sockets TCP & 10KB & 500 & 0.1410 & 0.1348 & 0.0317 & 0.2061 & 6895.5 \\
+\bottomrule
+\end{tabular}
+\end{table}
