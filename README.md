@@ -11,7 +11,9 @@
 | Luis Jeremy Jaramillo Acosta | `@JeremyJaramillo72` | Implementación Sockets TCP, arquitectura TikZ, fundamento SD/ANSA y documentación |
 | Kenny Isaías España Vera | `@Kespanav` | Contrato Protobuf, implementación gRPC, fundamento fallos/seguridad y QA reproducible |
 | Heiner Ariel Zambrano Ronquillo | `@Heiner-ZZZ` | Núcleo Lamport/configuración, protocolo experimental y discusión PFC-CAP |
-| Luis Alberto Paca Pilataza | `@Luispaca2002` | Motor estadístico, gráficos 300 DPI, verificación real de Lamport y conclusiones |
+| Luis Alberto Paca Pilataza | `@Luis-paca` *(principal)* / `@Luispaca2002` *(secundaria)* | Motor estadístico, gráficos 300 DPI, verificación real de Lamport y conclusiones |
+
+> **Nota de autoría en GitHub:** Las cuentas `@Luis-paca` (principal) y `@Luispaca2002` (secundaria) pertenecen ambas a **Luis Alberto Paca Pilataza**. Por un error temporal de configuración local de `git config` el 18/11/2026, los commits [`b8dcbb0`](https://github.com/Heiner-ZZZ/GA-SUM-02-PE-U1-Comunicaci-n-entre-Procesos-Distribuidos-con-gRPC-y-Sockets-TCP/commit/b8dcbb0a099f4d5babe6ebb372ce4b4db870940e) y [`d24c405`](https://github.com/Heiner-ZZZ/GA-SUM-02-PE-U1-Comunicaci-n-entre-Procesos-Distribuidos-con-gRPC-y-Sockets-TCP/commit/d24c40522d26e02e98166f5bc64d77f3151459b1) quedaron registrados bajo `@Luispaca2002`; posteriormente se corrigió la configuración a `@Luis-paca` sin reescribir el historial compartido de `main`, por lo que todos los commits de ambas cuentas corresponden a su autoría.
 
 ---
 
